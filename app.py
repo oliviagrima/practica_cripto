@@ -1,5 +1,5 @@
 
-class Aplication():
+class Aplication:
     def inicio():
         print("\n---------------------------Iniciando la aplicación---------------------------")
         print("\nQue desea hacer?")
@@ -14,13 +14,24 @@ class Aplication():
         elif comando == "2":
             Aplication.iniciar_sesion()
         elif comando == "3":
-            print("\n---------------------------Saliendo de la aplicación---------------------------")
+            print("\n--------------------------Saliendo de la aplicación--------------------------")
         else:
             print("\nComando no válido")
             Aplication.inicio()
     
     def registro():
-        print("\n---------------------------Registro---------------------------")
+        print("\n------------------------------Registro------------------------------")
+        usuario = input("\nIngrese el nombre de usuario: ")
+        contraseña = input("\nIngrese la contraseña: ")
+        confirmar_contraseña = input("\nConfirme la contraseña: ")
+
+        while contraseña != confirmar_contraseña:
+            print("\nLas contraseñas no coinciden")
+            contraseña = input("\nIngrese la contraseña: ")
+            confirmar_contraseña = input("\nConfirme la contraseña: ")
+            
+        print("\nUsuario registrado con éxito")
+
     def iniciar_sesion():
-        print("\n---------------------------Iniciar sesión---------------------------")
+        print("\n---------------------------Inicio de sesión---------------------------")
 
