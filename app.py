@@ -1,3 +1,4 @@
+from registro_bbdd import Base_datos
 
 class Aplication:
     def inicio(self):
@@ -48,7 +49,14 @@ class Aplication:
             print("\nLas contraseñas no coinciden, por favor, vuelva a intentarlo")
             contraseña = input("\nIngrese la contraseña: ")
             confirmar_contraseña = input("\nConfirme la contraseña: ")
-            
+        
+        salt = Base_datos.generador_salt()
+
+        token = Base_datos.generador_token(usuario, contraseña.encode(), salt)
+
+        Base_datos.guardar_json_salt_token(usuario, salt, token)
+
+
         print("\nUsuario registrado con éxito")
 
     def iniciar_sesion(self):
