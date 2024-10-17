@@ -1,2 +1,2 @@
 class Encriptar:
-    def
+    ...
