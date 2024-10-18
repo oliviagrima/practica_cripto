@@ -7,11 +7,15 @@ class Aplication:
         self.seguir_en_inicio = True
 
     def inicio(self):
-        print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\tIniciando la aplicación\n------------------------------------------------------------------------------------------------------------\n")
-
+        print("------------------------------------------------------------------------------------------------------------")
+        print("\t\t\t▗▖  ▗▖ ▗▄▖ ▗▄▄▄ ▗▄▄▖ ▗▄▄▄▖▗▄▄▄      ▗▄▄▖▗▄▄▄▖▗▄▖ ▗▄▄▖  ▗▄▄")
+        print("\t\t\t▐▛▚▞▜▌▐▌ ▐▌▐▌  █▐▌ ▐▌  █  ▐▌  █    ▐▌     █ ▐▌ ▐▌▐▌ ▐▌▐▌   ")
+        print("\t\t\t▐▌  ▐▌▐▛▀▜▌▐▌  █▐▛▀▚▖  █  ▐▌  █     ▝▀▚▖  █ ▐▛▀▜▌▐▛▀▚▖ ▝▀▚▖")
+        print("\t\t\t▐▌  ▐▌▐▌ ▐▌▐▙▄▄▀▐▌ ▐▌▗▄█▄▖▐▙▄▄▀    ▗▄▄▞▘  █ ▐▌ ▐▌▐▌ ▐▌▗▄▄▞▘")
+        print("------------------------------------------------------------------------------------------------------------")
         while self.seguir_en_inicio:
             try:
-                print("\nQue desea hacer?")
+                print("\nQUÉ DESEA HACER?")
                 print("\n\t1. Registrarse")
                 print("\n\t2. Iniciar sesión")
                 print("\n\t3. Salir")
@@ -21,29 +25,29 @@ class Aplication:
                 elif comando == "2":
                     self.iniciar_sesion()
                 elif comando == "3":
-                    print("------------------------------------------------------------------------------------------------------------\n\t\t\t\t\tSaliendo de la aplicación \n------------------------------------------------------------------------------------------------------------")
+                    print("------------------------------------------------------------------------------------------------------------\n\t\t\t\t\tSALIENDO DE LA APLICACIÓN \n------------------------------------------------------------------------------------------------------------")
                     self.seguir_en_inicio = False
                 else:
-                    print("\n------------------------------------------------------Comando no válido------------------------------------------------------")
+                    print("\n---------------------------------------------Comando no válido---------------------------------------------")
                     comando = input("\nPor favor, ingrese un número del 1 al 3: ")
                     if comando == "1":
                         self.registro()
                     elif comando == "2":
                         self.iniciar_sesion()
                     elif comando == "3":
-                        print("------------------------------------------------------------------------------------------------------------\n\t\t\t\t\tSaliendo de la aplicación \n------------------------------------------------------------------------------------------------------------")
+                        print("------------------------------------------------------------------------------------------------------------\n\t\t\t\t\tSALIENDO DE LA APLICACIÓN \n------------------------------------------------------------------------------------------------------------")
                         self.seguir_en_inicio = False
 
             except KeyboardInterrupt:
-                print("------------------------------------------------------------------------------------------------------------\n\t\t\t\t\tSaliendo de la aplicación \n------------------------------------------------------------------------------------------------------------")
+                print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\tSALIENDO DE LA APLICACIÓN \n------------------------------------------------------------------------------------------------------------")
                 self.seguir_en_inicio = False
 
     def registro(self):
-        print("\n-------------------------------------Registro-------------------------------------")
+        print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tREGISTRO \n------------------------------------------------------------------------------------------------------------")
         usuario = input("\nIngrese el nombre de usuario: ")
         
         while Base_datos.confirmar_usuario(usuario):
-            print("\n---------------------Este usuario ya existe, por favor, ingrese otro nombre de usuario---------------------")
+            print("\n----------------------Este usuario ya existe, por favor, ingrese otro nombre de usuario----------------------")
             usuario = input("\nIngrese el nombre de usuario: ")
 
         contraseña_adecuada= False
@@ -51,10 +55,10 @@ class Aplication:
             contraseña = getpass.getpass("\nIngrese la contraseña: ")
 
             if usuario == "" or contraseña == "":
-                print("\n-------------------------------------Por favor, complete todos los campos-------------------------------------")
+                print("\n------------------------------------Por favor, complete todos los campos------------------------------------")
 
             if len(contraseña)<8:
-                print("\n------La longitud de la contraseña debe ser de 8 caracteres como mínimo, intentelo de nuevo------")
+                print("\n------------La longitud de la contraseña debe ser de 8 caracteres como mínimo, intentelo de nuevo------------")
             
             else:
                 contraseña_adecuada = True
@@ -62,7 +66,7 @@ class Aplication:
         confirmar_contraseña = getpass.getpass("\nConfirme la contraseña: ")
 
         while contraseña != confirmar_contraseña:
-            print("\n----------------Las contraseñas no coinciden, por favor, vuelva a intentarlo----------------")
+            print("\n-------------------------Las contraseñas no coinciden, por favor, vuelva a intentarlo-------------------------")
             contraseña = getpass.getpass("\nIngrese la contraseña: ")
             confirmar_contraseña = getpass.getpass("\nConfirme la contraseña: ")
         
@@ -72,10 +76,10 @@ class Aplication:
 
         Base_datos.guardar_json_salt_token(usuario, salt, token)
 
-        print("\n-------------------------------------Usuario registrado con éxito-------------------------------------")
+        print("\n----------------------------------------Usuario registrado con éxito----------------------------------------")
 
     def iniciar_sesion(self):
-        print("\n-------------------------------------Inicio de sesión-------------------------------------")
+        print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tINICIO DE SESIÓN \n------------------------------------------------------------------------------------------------------------")
         usuario = input("\nIngrese el nombre de usuario: ")
         contraseña = getpass.getpass("\nIngrese la contraseña: ")
 
@@ -94,15 +98,20 @@ class Aplication:
                 print("\n-------------------------------------Usuario o contraseña incorrectos-------------------------------------")
 
         else:
-            print("\n-------------------------El usuario no existe en nuestra base de datos, debe registrarse-------------------------")
+            print("\n-----------------------El usuario no existe en nuestra base de datos, debe registrarse-----------------------")
 
 
     def juego(self):
-        print("------------------------------------------------------------------------------------------------------------\n\t\t\t\t\tBIENVENIDO AL MADRID STARS\n------------------------------------------------------------------------------------------------------------")
+        print("-------------------------------------------------------------------------------------------------------------")
+        print("\t\t\t▗▄▄▖ ▗▄▄▄▖▗▄▄▄▖▗▖  ▗▖▗▖  ▗▖▗▄▄▄▖▗▖  ▗▖▗▄▄▄▖▗▄▄▄  ▗▄▖")
+        print("\t\t\t▐▌ ▐▌  █  ▐▌   ▐▛▚▖▐▌▐▌  ▐▌▐▌   ▐▛▚▖▐▌  █  ▐▌  █▐▌ ▐▌")
+        print("\t\t\t▐▛▀▚▖  █  ▐▛▀▀▘▐▌ ▝▜▌▐▌  ▐▌▐▛▀▀▘▐▌ ▝▜▌  █  ▐▌  █▐▌ ▐▌")
+        print("\t\t\t▐▙▄▞▘▗▄█▄▖▐▙▄▄▖▐▌  ▐▌ ▝▚▞▘ ▐▙▄▄▖▐▌  ▐▌▗▄█▄▖▐▙▄▄▀▝▚▄▞▘")
+        print("-------------------------------------------------------------------------------------------------------------")
         seguir_en_juego = True
         while seguir_en_juego:
             try:
-                print("\nQue desea hacer?")
+                print("\nQUÉ DESEA HACER?")
                 print("\n\t1. Ver mercado de fichajes")
                 print("\n\t2. Ver tu equipo")
                 print("\n\t3. Salir")
@@ -112,17 +121,17 @@ class Aplication:
                 elif comando == "2":
                     self.equipo()
                 elif comando == "3":
-                    print("------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tSaliendo del juego \n------------------------------------------------------------------------------------------------------------")
+                    print("------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tSALIENDO DEL JUEGO \n------------------------------------------------------------------------------------------------------------")
                     seguir_en_juego = False
                     self.seguir_en_inicio = True
 
             except KeyboardInterrupt:
-                print("------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tSaliendo del juego \n------------------------------------------------------------------------------------------------------------")
+                print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tSALIENDO DEL JUEGO \n------------------------------------------------------------------------------------------------------------")
                 seguir_en_juego = False
                 self.seguir_en_inicio = True
 
     def mercado(self):
-        print("\n-------------------------------------MERCADO DE FICHAJES-------------------------------------")
+        print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tMERCADO DE FICHAJES \n-----------------------------------------------------------------------------------------------------------")
     
     def equipo(self):
-        print("\n-------------------------------------TU EQUIPO-------------------------------------")
+        print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tTU EQUIPO \n-----------------------------------------------------------------------------------------------------------")
