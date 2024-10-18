@@ -20,20 +20,6 @@ class Base_datos:
             pass
         f.close()
     
-    def generador_salt():
-        salt = os.urandom(16)
-        return salt
-
-    def generador_token(usuario, contraseña, salt):
-        kdf = PBKDF2HMAC(
-            algorithm=hashes.SHA256(),
-            length=32,
-            salt=salt,
-            iterations=480000,
-        )
-        token = base64.urlsafe_b64encode(kdf.derive(contraseña))
-        return token
-    
     def guardar_json_salt_token(usuario, salt, token):
         f = open("base_de_datos/clientes.json", "r")
         try:

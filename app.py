@@ -1,4 +1,5 @@
 from registro_bbdd import Base_datos
+from encriptacion import Encriptar
 import getpass
 
 class Aplication:
@@ -65,9 +66,9 @@ class Aplication:
             contraseña = getpass.getpass("\nIngrese la contraseña: ")
             confirmar_contraseña = getpass.getpass("\nConfirme la contraseña: ")
         
-        salt = Base_datos.generador_salt()
+        salt = Encriptar.generador_salt()
 
-        token = Base_datos.generador_token(usuario, contraseña.encode(), salt)
+        token = Encriptar.generador_token(usuario, contraseña.encode(), salt)
 
         Base_datos.guardar_json_salt_token(usuario, salt, token)
 
@@ -82,7 +83,7 @@ class Aplication:
 
             salt_guardado = Base_datos.sacar_json_salt(usuario)
 
-            token_nuevo = Base_datos.generador_token(usuario, contraseña.encode(), bytes.fromhex(salt_guardado)).hex()
+            token_nuevo = Encriptar.generador_token(usuario, contraseña.encode(), bytes.fromhex(salt_guardado)).hex()
 
             token_guardado = Base_datos.sacar_json_token(usuario)
 
