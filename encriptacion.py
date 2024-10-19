@@ -34,6 +34,19 @@ class Encriptar:
         f = Fernet(key)
         salt_cifrado = f.encrypt(salt)
         return salt_cifrado
+    
+    def desencriptar_salt(salt_cifrado):
+        key = Encriptar.encriptar_salt().key
+        f = Fernet(key)
+        salt = f.decrypt(salt_cifrado)
+        return salt
+   
+    def desencriptar_token(token_cifrado):
+        key = Encriptar.encriptar_token().key
+        f = Fernet(key)
+        token = f.decrypt(token_cifrado)
+        return token
+
 
 
 

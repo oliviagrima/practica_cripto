@@ -87,11 +87,17 @@ class Aplication:
 
             salt_guardado = Base_datos.sacar_json_salt(usuario)
 
-            token_nuevo = Encriptar.generador_token(usuario, contraseña.encode(), bytes.fromhex(salt_guardado)).hex()
+            salt_guardado_descifrado = Encriptar.desencriptar_salt(bytes.fromhex(salt_guardado))
+
+            token_nuevo = Encriptar.generador_token(usuario, contraseña.encode(), bytes.fromhex(salt_guardado_descifrado)).hex()
+
+            token_nuevo_descifrado = Encriptar.desencriptar_token(bytes.fromhex(token_nuevo)).hex()
 
             token_guardado = Base_datos.sacar_json_token(usuario)
 
-            if token_nuevo == token_guardado:
+            token_guardado_descifrado = Encriptar.desencriptar_token(bytes.fromhex(token_guardado)).hex()
+
+            if token_nuevo_descifrado == token_guardado_descifrado:
                 self.seguir_en_inicio = False
                 self.juego()
             else:
