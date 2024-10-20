@@ -7,7 +7,11 @@
         ]
     },
     "olivia": {
-        "saldo": 40,
-        "equipo": []
+        "saldo": 32,
+        "equipo": [
+            "Valverde",
+            "Mbappe",
+            "E. Militao"
+        ]
     }
 }
