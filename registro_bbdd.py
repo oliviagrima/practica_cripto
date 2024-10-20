@@ -101,11 +101,4 @@ class Base_datos:
             else:
                 for jugador in equipo:
                     print("\t- ", jugador)
-            
-            if len(equipo) < 11:
-                print("\n-------------------------------Le faltan", 11-len(equipo), "jugadores para completar su equipo-------------------------------")
-            
-            else:
-                print("\n--------------------------------¡Enhorabuena! Ha completado la plantilla--------------------------------")
-
         f.close()

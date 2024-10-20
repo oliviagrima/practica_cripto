@@ -180,9 +180,11 @@ class Aplication:
         print("\nJUGADORES DISPONIBLES:")
         jugadores_aleatorios = random.sample(lista_jugadores, 3)
         indice = 1
+
+        precios_jugadores = {}
         for jugador in jugadores_aleatorios:
-            precio = random.randint(2, 5)
-            print("\n\t",indice, "→", jugador, ":", precio, "M€")
+            precios_jugadores[jugador] = random.randint(2, 5)
+            print("\n\t",indice, "→", jugador, ":", precios_jugadores[jugador], "M€")
             indice += 1 
 
         acabar_pregunta = False
@@ -191,7 +193,7 @@ class Aplication:
             print("\nSaldo disponible: ", saldo_usuario, "M€")
             compra = input("\nDESEA COMPRAR ALGÚN JUGADOR? (si/no): ").lower()
             if compra == "si":
-                self.comprar_jugador(usuario, jugadores_aleatorios)
+                self.comprar_jugador(usuario, jugadores_aleatorios, precios_jugadores)
                 acabar_pregunta = True
 
             elif compra == "no":
@@ -202,7 +204,7 @@ class Aplication:
                 print("\n---------------------------------------------Comando no válido---------------------------------------------")
                 compra = input("\nPor favor, ingrese 'si' o 'no': ")
                 if compra == "si":
-                    self.comprar_jugador(usuario, jugadores_aleatorios)
+                    self.comprar_jugador(usuario, jugadores_aleatorios, precios_jugadores)
                     acabar_pregunta = True
 
                 elif compra == "no":
@@ -210,15 +212,11 @@ class Aplication:
                     acabar_pregunta = True
                 
 
-    def comprar_jugador(self, usuario, jugadores_aleatorios):
+    def comprar_jugador(self, usuario, jugadores_aleatorios, precios_jugadores):
         print("\n-----------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tCOMPRAR JUGADOR \n-----------------------------------------------------------------------------------------------------------")
         
         jugador_comprado = input("\nIngrese el nombre del jugador que desea comprar: ")
         compra_de_jugadores = True
-
-        precios_jugadores = {}
-        for jugador in jugadores_aleatorios:
-            precios_jugadores[jugador] = random.randint(2, 5)
 
         while compra_de_jugadores:
             if jugador_comprado in jugadores_aleatorios:
@@ -233,4 +231,5 @@ class Aplication:
         print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tTU EQUIPO \n------------------------------------------------------------------------------------------------------------")
         print("\nJUGADORES DE TU EQUIPO: \n")
         Base_datos.visualizar_equipo(usuario)
+        print("\n------------------------------------------------------------------------------------------------------------")
         
