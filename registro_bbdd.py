@@ -8,20 +8,15 @@ import json
 class Base_datos:
     def confirmar_usuario(usuario):
         try:
-            f = open("base_de_datos/clientes.json", "r")
             with open("base_de_datos/clientes.json", "r") as f:
                 data = json.load(f)
                 if usuario in data:
                     return True
-                    #print("\nEste usuario ya existe, por favor, ingrese otro nombre de usuario")
-                    #usuario = input("\nIngrese el nombre de usuario: ")
-                    #Base_datos.confirmar_usuario(usuario)
         except(json.decoder.JSONDecodeError, FileNotFoundError):
             pass
         f.close()
     
     def guardar_json_salt_token(usuario, salt, token):
-        f = open("base_de_datos/clientes.json", "r")
         try:
             with open("base_de_datos/clientes.json", "r") as f:
                 data = json.load(f)
@@ -49,4 +44,61 @@ class Base_datos:
             data = json.load(f)
             token = data[usuario]["token"]
         return token
+    
+    def crear_equipo(usuario):
+        try:
+            with open("base_de_datos/equipos_usuarios.json", "r") as f:
+                data = json.load(f)
+        except(json.decoder.JSONDecodeError, FileNotFoundError):
+            data = {}
         
+        if usuario not in data:
+            data[usuario] = {"saldo": 40,
+                             "equipo": []}
+
+        with open("base_de_datos/equipos_usuarios.json", "w") as f:
+            json.dump(data, f, indent=4)
+        
+        f.close()
+    
+    def mostrar_saldo(usuario):
+        with open("base_de_datos/equipos_usuarios.json", "r") as f:
+            data = json.load(f)
+            saldo = data[usuario]["saldo"]
+        return saldo
+
+    def fichar_jugador(usuario, jugador_comprado, precio_jugador):
+        try:
+            with open("base_de_datos/equipos_usuarios.json", "r") as f:
+                data = json.load(f)
+        except(json.decoder.JSONDecodeError, FileNotFoundError):
+            data = {}
+
+        saldo_usuario = data[usuario]["saldo"]
+
+        if saldo_usuario >= precio_jugador:
+            if jugador_comprado not in data[usuario]["equipo"]:
+                data[usuario]["saldo"] -= precio_jugador
+                data[usuario]["equipo"].append(jugador_comprado)
+                print("\n------------------------------------Ha comprado a ",jugador_comprado," por",precio_jugador,"M€-------------------------------------")
+            else:
+                print("\n---------------------Ya tiene este jugador en tu equipo, no puede volver a comprarlo---------------------")
+        else:
+            print("\n------------------------No tiene suficiente saldo para fichar a ", jugador_comprado, "------------------------")
+        with open("base_de_datos/equipos_usuarios.json", "w") as f:
+            json.dump(data, f, indent=4)
+        
+        f.close()
+
+    def visualizar_equipo(usuario):
+        f = open("base_de_datos/equipos_usuarios.json", "r")
+        with open("base_de_datos/equipos_usuarios.json", "r") as f:
+            data = json.load(f)
+
+            equipo = data[usuario]["equipo"]
+            if not equipo:
+                print("No tienes ningún fichaje todavía.")
+            else:
+                for jugador in equipo:
+                    print("\t- ", jugador)
+        f.close()

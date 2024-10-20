@@ -1,6 +1,8 @@
 from registro_bbdd import Base_datos
 from encriptacion import Encriptar
 import getpass
+import random
+import json
 
 class Aplication:
     def __init__(self):
@@ -58,7 +60,7 @@ class Aplication:
                 print("\n------------------------------------Por favor, complete todos los campos------------------------------------")
 
             if len(contraseña)<8:
-                print("\n------------La longitud de la contraseña debe ser de 8 caracteres como mínimo, intentelo de nuevo------------")
+                print("\n------------La longitud de la contraseña debe ser de 8 caracteres como mínimo, inténtelo de nuevo------------")
             
             else:
                 contraseña_adecuada = True
@@ -76,68 +78,160 @@ class Aplication:
 
         Base_datos.guardar_json_salt_token(usuario, salt, token)
 
+        Base_datos.crear_equipo(usuario)
+
         print("\n----------------------------------------Usuario registrado con éxito----------------------------------------")
 
     def iniciar_sesion(self):
         print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tINICIO DE SESIÓN \n------------------------------------------------------------------------------------------------------------")
-        usuario = input("\nIngrese el nombre de usuario: ")
-        contraseña = getpass.getpass("\nIngrese la contraseña: ")
+        inicio_correcto = False
 
-        if Base_datos.confirmar_usuario(usuario):
+        while not inicio_correcto:
 
-            salt_guardado = Base_datos.sacar_json_salt(usuario)
+            usuario = input("\nIngrese el nombre de usuario: ")
+            contraseña = getpass.getpass("\nIngrese la contraseña: ")
 
-            salt_guardado_descifrado = Encriptar.desencriptar_salt(bytes.fromhex(salt_guardado))
+            if Base_datos.confirmar_usuario(usuario):
 
-            token_nuevo = Encriptar.generador_token(usuario, contraseña.encode(), bytes.fromhex(salt_guardado_descifrado)).hex()
+                salt_guardado = Base_datos.sacar_json_salt(usuario)
 
-            token_nuevo_descifrado = Encriptar.desencriptar_token(bytes.fromhex(token_nuevo)).hex()
+                #salt_guardado_descifrado = Encriptar.desencriptar_salt(bytes.fromhex(salt_guardado))
 
-            token_guardado = Base_datos.sacar_json_token(usuario)
+                token_nuevo = Encriptar.generador_token(usuario, contraseña.encode(), bytes.fromhex(salt_guardado)).hex()
 
-            token_guardado_descifrado = Encriptar.desencriptar_token(bytes.fromhex(token_guardado)).hex()
+                #token_nuevo_descifrado = Encriptar.desencriptar_token(bytes.fromhex(token_nuevo)).hex()
 
-            if token_nuevo_descifrado == token_guardado_descifrado:
-                self.seguir_en_inicio = False
-                self.juego()
+                token_guardado = Base_datos.sacar_json_token(usuario)
+
+                #token_guardado_descifrado = Encriptar.desencriptar_token(bytes.fromhex(token_guardado)).hex()
+
+                if token_nuevo == token_guardado:
+                    self.seguir_en_inicio = False
+                    inicio_correcto = True
+                    self.juego(usuario)
+                else:
+                    print("\n-----------------------------Usuario o contraseña incorrectos, inténtelo de nuevo-----------------------------")
+
             else:
-                print("\n-------------------------------------Usuario o contraseña incorrectos-------------------------------------")
+                print("\n-----------------El usuario no existe en nuestra base de dato o la contraseña es incorrecta-----------------")
+                inicio_correcto = True #tengo que poner que se ha iniciado correctamente para poder volver a la pantalla de registro
+                self._seguir_en_inicio = True
 
-        else:
-            print("\n-----------------------El usuario no existe en nuestra base de datos, debe registrarse-----------------------")
 
-
-    def juego(self):
-        print("-------------------------------------------------------------------------------------------------------------")
+    def juego(self, usuario):
+        print("------------------------------------------------------------------------------------------------------------")
         print("\t\t\t▗▄▄▖ ▗▄▄▄▖▗▄▄▄▖▗▖  ▗▖▗▖  ▗▖▗▄▄▄▖▗▖  ▗▖▗▄▄▄▖▗▄▄▄  ▗▄▖")
         print("\t\t\t▐▌ ▐▌  █  ▐▌   ▐▛▚▖▐▌▐▌  ▐▌▐▌   ▐▛▚▖▐▌  █  ▐▌  █▐▌ ▐▌")
         print("\t\t\t▐▛▀▚▖  █  ▐▛▀▀▘▐▌ ▝▜▌▐▌  ▐▌▐▛▀▀▘▐▌ ▝▜▌  █  ▐▌  █▐▌ ▐▌")
         print("\t\t\t▐▙▄▞▘▗▄█▄▖▐▙▄▄▖▐▌  ▐▌ ▝▚▞▘ ▐▙▄▄▖▐▌  ▐▌▗▄█▄▖▐▙▄▄▀▝▚▄▞▘")
-        print("-------------------------------------------------------------------------------------------------------------")
+        print("------------------------------------------------------------------------------------------------------------")
         seguir_en_juego = True
         while seguir_en_juego:
             try:
                 print("\nQUÉ DESEA HACER?")
                 print("\n\t1. Ver mercado de fichajes")
-                print("\n\t2. Ver tu equipo")
-                print("\n\t3. Salir")
+                print("\n\t2. Ver equipo")
+                print("\n\t3. Ver saldo disponible")
+                print("\n\t4. Salir")
                 comando = input("\nIngrese el número de la acción que desea realizar: ")
                 if comando == "1":
-                    self.mercado() 
+                    self.mercado(usuario) 
                 elif comando == "2":
-                    self.equipo()
+                    self.equipo(usuario)
                 elif comando == "3":
+                    print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tSALDO DISPONIBLE \n------------------------------------------------------------------------------------------------------------")
+                    if Base_datos.mostrar_saldo(usuario) > 0:
+                        print("Tiene", Base_datos.mostrar_saldo(usuario), "M€")
+                        print("------------------------------------------------------------------------------------------------------------")
+                    else:
+                        print("\n------------------------------------------No le queda saldo------------------------------------------")
+    
+                elif comando == "4":
                     print("------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tSALIENDO DEL JUEGO \n------------------------------------------------------------------------------------------------------------")
                     seguir_en_juego = False
                     self.seguir_en_inicio = True
+                else:
+                    print("\n---------------------------------------------Comando no válido---------------------------------------------")
+                    comando = input("\nPor favor, ingrese un número del 1 al 3: ")
+                    if comando == "1":
+                        self.mercado(usuario) 
+                    elif comando == "2":
+                        self.equipo(usuario)
+                    elif comando == "3":
+                        print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tSALDO DISPONIBLE \n------------------------------------------------------------------------------------------------------------")
+                        if Base_datos.mostrar_saldo(usuario) > 0:
+                            print("Tiene", Base_datos.mostrar_saldo(usuario), "M€")
+                            print("------------------------------------------------------------------------------------------------------------")
+                        else:
+                            print("\n------------------------------------------No le queda saldo------------------------------------------")
+                    elif comando == "4":
+                        print("------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tSALIENDO DEL JUEGO \n------------------------------------------------------------------------------------------------------------")
+                        seguir_en_juego = False
+                        self.seguir_en_inicio = True
 
             except KeyboardInterrupt:
                 print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tSALIENDO DEL JUEGO \n------------------------------------------------------------------------------------------------------------")
                 seguir_en_juego = False
                 self.seguir_en_inicio = True
 
-    def mercado(self):
-        print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tMERCADO DE FICHAJES \n-----------------------------------------------------------------------------------------------------------")
+    def mercado(self, usuario):
+        print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tMERCADO DE FICHAJES \n------------------------------------------------------------------------------------------------------------")
+        lista_jugadores = ["Vini Jr", "Mbappé", "Rodrygo", "Bellingham", "Tchouameni", "Valverde", "F. Mendy", "Rüdiger", "E. Militao", "Carvajal", "Courtois"]
+        print("\nJUGADORES DISPONIBLES:")
+        jugadores_aleatorios = random.sample(lista_jugadores, 3)
+        indice = 1
+        for jugador in jugadores_aleatorios:
+            precio = random.randint(2, 5)
+            print("\n\t",indice, "→", jugador, ":", precio, "M€")
+            indice += 1 
+
+        acabar_pregunta = False
+        while not acabar_pregunta:
+            saldo_usuario = Base_datos.mostrar_saldo(usuario)
+            print("\nSaldo disponible: ", saldo_usuario, "M€")
+            compra = input("\nDESEA COMPRAR ALGÚN JUGADOR? (si/no): ").lower()
+            if compra == "si":
+                self.comprar_jugador(usuario, jugadores_aleatorios)
+                acabar_pregunta = True
+
+            elif compra == "no":
+                print("\n---------------------------------------No ha comprado ningún jugador---------------------------------------")
+                acabar_pregunta = True
+            
+            else:
+                print("\n---------------------------------------------Comando no válido---------------------------------------------")
+                compra = input("\nPor favor, ingrese 'si' o 'no': ")
+                if compra == "si":
+                    self.comprar_jugador(usuario, jugadores_aleatorios)
+                    acabar_pregunta = True
+
+                elif compra == "no":
+                    print("\n----------------------------------------No ha comprado ningún jugador----------------------------------------")
+                    acabar_pregunta = True
+                
+
+    def comprar_jugador(self, usuario, jugadores_aleatorios):
+        print("\n-----------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tCOMPRAR JUGADOR \n-----------------------------------------------------------------------------------------------------------")
+        
+        jugador_comprado = input("\nIngrese el nombre del jugador que desea comprar: ")
+        compra_de_jugadores = True
+
+        precios_jugadores = {}
+        for jugador in jugadores_aleatorios:
+            precios_jugadores[jugador] = random.randint(2, 5)
+
+        while compra_de_jugadores:
+            if jugador_comprado in jugadores_aleatorios:
+                precio_jugador = precios_jugadores[jugador_comprado]
+                Base_datos.fichar_jugador(usuario, jugador_comprado, precio_jugador)
+                compra_de_jugadores = False
+            else:
+                print("\n------------------------------------Jugador no disponible en el mercado------------------------------------")
+                jugador_comprado = input("\nIngrese el nombre del jugador que desea comprar: ")
     
-    def equipo(self):
-        print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tTU EQUIPO \n-----------------------------------------------------------------------------------------------------------")
+    def equipo(self, usuario):
+        print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tTU EQUIPO \n------------------------------------------------------------------------------------------------------------")
+        print("\nJUGADORES DE TU EQUIPO: \n")
+        Base_datos.visualizar_equipo(usuario)
+        print("\n------------------------------------------------------------------------------------------------------------")
+        
