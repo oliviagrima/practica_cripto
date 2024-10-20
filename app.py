@@ -176,7 +176,7 @@ class Aplication:
 
     def mercado(self, usuario):
         print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tMERCADO DE FICHAJES \n------------------------------------------------------------------------------------------------------------")
-        lista_jugadores = ["Vini Jr", "Mbappé", "Rodrygo", "Bellingham", "Tchouameni", "Valverde", "F. Mendy", "Rüdiger", "E. Militao", "Carvajal", "Courtois"]
+        lista_jugadores = ["Vini Jr", "Mbappé", "Rodrygo", "Bellingham", "Modric", "Valverde", "F. Mendy", "Rüdiger", "E. Militao", "Carvajal", "Courtois"]
         print("\nJUGADORES DISPONIBLES:")
         jugadores_aleatorios = random.sample(lista_jugadores, 3)
         indice = 1
