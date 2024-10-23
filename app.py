@@ -3,6 +3,7 @@ from encriptacion import Encriptar
 import getpass
 import random
 import json
+import base64
 
 class Aplication:
     def __init__(self):
@@ -76,11 +77,15 @@ class Aplication:
 
         Base_datos.guardar_json_clave(usuario, clave_encriptacion)
 
-        salt = Encriptar.generador_salt()
+        salt = Encriptar.generador_salt(usuario)
+
+        salt_base64 = base64.urlsafe_b64encode(salt)
+        salt_cifrado = Encriptar.encriptar(salt_base64, usuario)
+        print(salt_cifrado)
 
         token = Encriptar.generador_token(usuario, contraseña.encode(), salt)
 
-        Base_datos.guardar_json_salt_token(usuario, salt, token)
+        Base_datos.guardar_json_salt_token(usuario, salt_cifrado, token)
 
         Base_datos.crear_equipo(usuario)
 
@@ -98,18 +103,20 @@ class Aplication:
             if Base_datos.confirmar_usuario(usuario):
 
                 salt_guardado = Base_datos.sacar_json_salt(usuario)
+                
+                salt_guardado_descifrado_base64 = Encriptar.desencriptar(bytes.fromhex(salt_guardado), usuario)
+                
+                salt_original = base64.urlsafe_b64decode(salt_guardado_descifrado_base64)
 
-                #salt_guardado_descifrado = Encriptar.desencriptar_salt(bytes.fromhex(salt_guardado))
+                token_nuevo = Encriptar.generador_token(usuario, contraseña.encode(), salt_original)
 
-                token_nuevo = Encriptar.generador_token(usuario, contraseña.encode(), bytes.fromhex(salt_guardado)).hex()
-
-                #token_nuevo_descifrado = Encriptar.desencriptar_token(bytes.fromhex(token_nuevo)).hex()
-
+                token_nuevo_descifrado = Encriptar.desencriptar(token_nuevo, usuario).hex()
+                print(token_nuevo_descifrado)
                 token_guardado = Base_datos.sacar_json_token(usuario)
 
-                #token_guardado_descifrado = Encriptar.desencriptar_token(bytes.fromhex(token_guardado)).hex()
-
-                if token_nuevo == token_guardado:
+                token_guardado_descifrado = Encriptar.desencriptar(bytes.fromhex(token_guardado), usuario).hex()
+                print(token_guardado_descifrado)
+                if token_nuevo_descifrado == token_guardado_descifrado:
                     self.seguir_en_inicio = False
                     inicio_correcto = True
                     self.juego(usuario)

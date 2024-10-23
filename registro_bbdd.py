@@ -17,6 +17,7 @@ class Base_datos:
         f.close()
     
     def guardar_json_clave(usuario, clave):
+        clave_base64 = base64.urlsafe_b64encode(clave).hex()
         try:
             with open("base_de_datos/claves_clientes.json", "r") as f:
                 data = json.load(f)
@@ -24,7 +25,7 @@ class Base_datos:
             data = {}
 
         data[usuario] = {
-            "clave": clave
+            "clave": clave_base64
         }
 
         with open("base_de_datos/claves_clientes.json", "w") as file:
@@ -48,6 +49,12 @@ class Base_datos:
             json.dump(data, file, indent=4)
         
         f.close()
+
+    def sacar_json_clave(usuario):
+        with open("base_de_datos/claves_clientes.json", "r") as f:
+            data = json.load(f)
+            clave = base64.urlsafe_b64decode(bytes.fromhex(data[usuario]["clave"]))
+        return clave
 
     def sacar_json_salt(usuario):
         with open("base_de_datos/clientes.json", "r") as f:
