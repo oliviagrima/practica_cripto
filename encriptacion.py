@@ -7,6 +7,11 @@ from registro_bbdd import Base_datos
 
 class Encriptar:
 
+    def generador_clave():
+        key = Fernet.generate_key()
+        f = Fernet(key)
+        return f
+    
     def generador_salt():
         salt = os.urandom(16)
         #salt_cifrado = Encriptar.encriptar_salt(salt)
@@ -20,7 +25,6 @@ class Encriptar:
             iterations=480000,
         )
         token = base64.urlsafe_b64encode(kdf.derive(contraseña))
-        #f = Fernet(token)
         #token_cifrado = Encriptar.encriptar_token(token)
         return token
 """   

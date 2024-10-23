@@ -72,6 +72,10 @@ class Aplication:
             contraseña = getpass.getpass("\nIngrese la contraseña: ")
             confirmar_contraseña = getpass.getpass("\nConfirme la contraseña: ")
         
+        clave_encriptacion = Encriptar.generador_clave()
+
+        Base_datos.guardar_json_clave(usuario, clave_encriptacion)
+
         salt = Encriptar.generador_salt()
 
         token = Encriptar.generador_token(usuario, contraseña.encode(), salt)

@@ -16,6 +16,22 @@ class Base_datos:
             pass
         f.close()
     
+    def guardar_json_clave(usuario, clave):
+        try:
+            with open("base_de_datos/claves_clientes.json", "r") as f:
+                data = json.load(f)
+        except(json.decoder.JSONDecodeError, FileNotFoundError):
+            data = {}
+
+        data[usuario] = {
+            "clave": clave
+        }
+
+        with open("base_de_datos/claves_clientes.json", "w") as file:
+            json.dump(data, file, indent=4)
+        
+        f.close()
+
     def guardar_json_salt_token(usuario, salt, token):
         try:
             with open("base_de_datos/clientes.json", "r") as f:
