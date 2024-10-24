@@ -1,6 +1,7 @@
 from app import Aplication
 
 class Main:
+    
     def __init__(self):
         self.app = Aplication()
 

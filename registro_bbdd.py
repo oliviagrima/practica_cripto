@@ -3,8 +3,24 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import json
 from encriptacion import Encriptar
 from cryptography.fernet import Fernet
-class Base_datos:
 
+class Base_datos:
+ 
+    def comprobar_fichero_encriptado():
+        try:
+            with open("base_de_datos/clientes.json", 'r') as file:
+                json.load(file)
+            return False
+        except json.JSONDecodeError:
+            return True  
+        
+    def comprobar_fichero_vacio():
+        with open("base_de_datos/clientes.json", 'r') as file:
+            if file.read() == "":
+                return True
+            else:
+                return False
+ 
     def encriptar_fichero():
         key = Base_datos.sacar_json_clave()
         f = Fernet(key)
@@ -81,7 +97,8 @@ class Base_datos:
     def sacar_json_salt(usuario):
         with open("base_de_datos/clientes.json", "r") as f:
             data = json.load(f)
-            salt = data[usuario]["salt"]
+            salt_hex = data[usuario]["salt"]
+            salt = bytes.fromhex(salt_hex)
         return salt
     
     def sacar_json_token(usuario):

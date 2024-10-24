@@ -2,10 +2,9 @@ from registro_bbdd import Base_datos
 from encriptacion import Encriptar
 import getpass
 import random
-import base64
-import json
 
 class Aplication:
+
     def __init__(self):
         self.seguir_en_inicio = True
 
@@ -19,8 +18,10 @@ class Aplication:
         
         clave_encriptacion = Encriptar.generador_clave()
         Base_datos.guardar_json_clave(clave_encriptacion)
-        Base_datos.encriptar_fichero()
 
+        if not Base_datos.comprobar_fichero_encriptado() or Base_datos.comprobar_fichero_vacio():
+            Base_datos.encriptar_fichero()
+    
         while self.seguir_en_inicio:
             try:
                 print("\nQUÉ DESEA HACER?")
@@ -94,28 +95,29 @@ class Aplication:
     def iniciar_sesion(self):
         print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tINICIO DE SESIÓN \n------------------------------------------------------------------------------------------------------------")
         inicio_correcto = False
-        Base_datos.desencriptar_fichero()
         while not inicio_correcto:
             usuario = input("\nIngrese el nombre de usuario: ")
             contraseña = getpass.getpass("\nIngrese la contraseña: ")
 
+            Base_datos.desencriptar_fichero()
             if Base_datos.confirmar_usuario(usuario):
                 salt_guardado = Base_datos.sacar_json_salt(usuario)
                 token_nuevo = Encriptar.generador_token(usuario, contraseña.encode(), salt_guardado)
                 token_guardado = Base_datos.sacar_json_token(usuario)
+                Base_datos.encriptar_fichero()
 
-                if token_nuevo == token_guardado:
+                if token_nuevo.hex() == token_guardado:
                     self.seguir_en_inicio = False
                     inicio_correcto = True
                     self.juego(usuario)
+
                 else:
                     print("\n-----------------------------Usuario o contraseña incorrectos, inténtelo de nuevo-----------------------------")
 
             else:
-                print("\n-----------------El usuario no existe en nuestra base de dato o la contraseña es incorrecta-----------------")
+                print("\n-----------------El usuario no existe en nuestra base de datos o la contraseña es incorrecta-----------------")
                 inicio_correcto = True #tengo que poner que se ha iniciado correctamente para poder volver a la pantalla de registro
                 self._seguir_en_inicio = True
-
 
     def juego(self, usuario):
         print("------------------------------------------------------------------------------------------------------------")
