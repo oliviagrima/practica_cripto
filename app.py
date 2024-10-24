@@ -19,8 +19,7 @@ class Aplication:
         
         clave_encriptacion = Encriptar.generador_clave()
         Base_datos.guardar_json_clave(clave_encriptacion)
-        fichero = Base_datos.leer_fichero_en_binario()
-        Encriptar.encriptar(fichero)
+        Base_datos.encriptar_fichero()
 
         while self.seguir_en_inicio:
             try:
@@ -82,21 +81,20 @@ class Aplication:
         salt = Encriptar.generador_salt(usuario)
         token = Encriptar.generador_token(usuario, contraseña.encode(), salt)
 
-        fichero_cifrado = Base_datos.leer_fichero_en_binario()
-        Encriptar.desencriptar(fichero_cifrado)
-        
-        fichero_actualizado = Base_datos.guardar_json_salt_token(usuario, salt, token).encode()
+        Base_datos.desencriptar_fichero()
+
+        Base_datos.guardar_json_salt_token(usuario, salt, token)
         
         Base_datos.crear_equipo(usuario)
 
-        Encriptar.encriptar(fichero_actualizado)
+        Base_datos.encriptar_fichero()
 
         print("\n----------------------------------------Usuario registrado con éxito----------------------------------------")
 
     def iniciar_sesion(self):
         print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tINICIO DE SESIÓN \n------------------------------------------------------------------------------------------------------------")
         inicio_correcto = False
-
+        Base_datos.desencriptar_fichero()
         while not inicio_correcto:
             usuario = input("\nIngrese el nombre de usuario: ")
             contraseña = getpass.getpass("\nIngrese la contraseña: ")

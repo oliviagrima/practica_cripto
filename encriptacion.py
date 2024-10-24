@@ -3,7 +3,6 @@ import os
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from registro_bbdd import Base_datos
 
 class Encriptar:
 
@@ -25,14 +24,10 @@ class Encriptar:
         token = base64.urlsafe_b64encode(kdf.derive(contraseña))
         return token
     
-    def encriptar(fichero):
-        key = Base_datos.sacar_json_clave()
-        f = Fernet(key)
+    def encriptar(fichero, f):
         fichero_cifrado = f.encrypt(fichero)
         return fichero_cifrado
     
-    def desencriptar(fichero_cifrado):
-        key = Base_datos.sacar_json_clave()
-        f = Fernet(key)
+    def desencriptar(fichero_cifrado, f):
         fichero = f.decrypt(fichero_cifrado)
         return fichero

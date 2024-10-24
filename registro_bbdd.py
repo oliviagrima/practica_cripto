@@ -1,13 +1,31 @@
 import base64
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import json
-
+from encriptacion import Encriptar
+from cryptography.fernet import Fernet
 class Base_datos:
 
-    def leer_fichero_en_binario():
-        with open("base_de_datos/clientes.json", "rb") as f:
-            fichero = f.read()
-        return fichero
+    def encriptar_fichero():
+        key = Base_datos.sacar_json_clave()
+        f = Fernet(key)
+        with open("base_de_datos/clientes.json", "rb") as file:
+            fichero = file.read()
+        fichero_encriptado = Encriptar.encriptar(fichero, f)
+
+        with open("base_de_datos/clientes.json", "wb") as file:
+            file.write(fichero_encriptado)
+        file.close()
+
+    def desencriptar_fichero():
+        key = Base_datos.sacar_json_clave()
+        f = Fernet(key)
+        with open("base_de_datos/clientes.json", "rb") as file:
+            fichero_encriptado = file.read()
+        fichero = Encriptar.desencriptar(fichero_encriptado, f)
+
+        with open("base_de_datos/clientes.json", "wb") as file:
+            file.write(fichero)
+        file.close()
 
     def confirmar_usuario(usuario):
         try:
