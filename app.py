@@ -86,6 +86,8 @@ class Aplication:
 
         Base_datos.guardar_json_salt_token(usuario, salt, token)
         
+        Base_datos.crear_carpeta_usuario(usuario)
+        
         Base_datos.crear_equipo(usuario)
 
         Base_datos.encriptar_fichero()

@@ -3,6 +3,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import json
 from encriptacion import Encriptar
 from cryptography.fernet import Fernet
+import os
 
 class Base_datos:
  
@@ -107,6 +108,22 @@ class Base_datos:
             token = data[usuario]["token"]
         return token
     
+    def crear_carpeta_usuario(usuario):
+        os.makedirs("base_de_datos/datos_usuarios", exist_ok=True)
+        ruta_archivo = f"base_de_datos/datos_usuarios/equipo_{usuario}.json"
+
+        try:
+            with open(ruta_archivo, "r") as f:
+                data = json.load(f)
+        except(json.decoder.JSONDecodeError, FileNotFoundError):
+            data = {}
+            data[usuario] = {"saldo": 40,
+                             "equipo": []}
+
+        with open(ruta_archivo, "w") as f:
+            json.dump(data, f, indent=4)
+        
+        f.close()
     def crear_equipo(usuario):
         try:
             with open("base_de_datos/equipos_usuarios.json", "r") as f:
