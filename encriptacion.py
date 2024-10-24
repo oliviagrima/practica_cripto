@@ -13,7 +13,6 @@ class Encriptar:
     
     def generador_salt(usuario):
         salt = os.urandom(32)
-        print(salt)
         return salt
 
     def generador_token(usuario, contraseña, salt):

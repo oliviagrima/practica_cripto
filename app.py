@@ -2,7 +2,6 @@ from registro_bbdd import Base_datos
 from encriptacion import Encriptar
 import getpass
 import random
-import json
 import base64
 
 class Aplication:
@@ -60,9 +59,9 @@ class Aplication:
             if usuario == "" or contraseña == "":
                 print("\n------------------------------------Por favor, complete todos los campos------------------------------------")
 
-            if len(contraseña)<8:
-                print("\n------------La longitud de la contraseña debe ser de 8 caracteres como mínimo, inténtelo de nuevo------------")
-            
+            if len(contraseña)<8 or contraseña.isalpha() or contraseña.isdigit() or contraseña.isalnum() or contraseña.islower():
+                print("\n-----La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un caracter especial, inténtelo de nuevo-----")
+        
             else:
                 contraseña_adecuada = True
         
