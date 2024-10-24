@@ -23,17 +23,16 @@ class Encriptar:
             iterations=480000,
         )
         token = base64.urlsafe_b64encode(kdf.derive(contraseña))
-        token_cifrado = Encriptar.encriptar(token, usuario)
-        return token_cifrado
+        return token
     
-    def encriptar(input, usuario):
-        key = Base_datos.sacar_json_clave(usuario)
+    def encriptar(fichero):
+        key = Base_datos.sacar_json_clave()
         f = Fernet(key)
-        input_cifrado = f.encrypt(input)
-        return input_cifrado
+        fichero_cifrado = f.encrypt(fichero)
+        return fichero_cifrado
     
-    def desencriptar(input_cifrado, usuario):
-        key = Base_datos.sacar_json_clave(usuario)
+    def desencriptar(fichero_cifrado):
+        key = Base_datos.sacar_json_clave()
         f = Fernet(key)
-        input = f.decrypt(input_cifrado)
-        return input
+        fichero = f.decrypt(fichero_cifrado)
+        return fichero

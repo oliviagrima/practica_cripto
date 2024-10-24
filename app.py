@@ -3,6 +3,7 @@ from encriptacion import Encriptar
 import getpass
 import random
 import base64
+import json
 
 class Aplication:
     def __init__(self):
@@ -15,6 +16,12 @@ class Aplication:
         print("\t\t\t▐▌  ▐▌▐▛▀▜▌▐▌  █▐▛▀▚▖  █  ▐▌  █     ▝▀▚▖  █ ▐▛▀▜▌▐▛▀▚▖ ▝▀▚▖")
         print("\t\t\t▐▌  ▐▌▐▌ ▐▌▐▙▄▄▀▐▌ ▐▌▗▄█▄▖▐▙▄▄▀    ▗▄▄▞▘  █ ▐▌ ▐▌▐▌ ▐▌▗▄▄▞▘")
         print("------------------------------------------------------------------------------------------------------------")
+        
+        clave_encriptacion = Encriptar.generador_clave()
+        Base_datos.guardar_json_clave(clave_encriptacion)
+        with open("base_de_datos/clientes.json", "rb") as fichero:
+            Encriptar.encriptar(fichero.read())
+
         while self.seguir_en_inicio:
             try:
                 print("\nQUÉ DESEA HACER?")
@@ -72,15 +79,17 @@ class Aplication:
             contraseña = getpass.getpass("\nIngrese la contraseña: ")
             confirmar_contraseña = getpass.getpass("\nConfirme la contraseña: ")
         
-        clave_encriptacion = Encriptar.generador_clave()
-        Base_datos.guardar_json_clave(usuario, clave_encriptacion)
         salt = Encriptar.generador_salt(usuario)
-        salt_base64 = base64.urlsafe_b64encode(salt)
-        salt_cifrado = Encriptar.encriptar(salt_base64, usuario)
         token = Encriptar.generador_token(usuario, contraseña.encode(), salt)
-        Base_datos.guardar_json_salt_token(usuario, salt_cifrado, token)
+
+        fichero = open("base_de_datos/clientes.json", "r")
+        Encriptar.desencriptar(fichero)
+
+        Base_datos.guardar_json_salt_token(usuario, salt, token)
         
         Base_datos.crear_equipo(usuario)
+
+        Encriptar.encriptar(fichero)
 
         print("\n----------------------------------------Usuario registrado con éxito----------------------------------------")
 
@@ -94,16 +103,10 @@ class Aplication:
 
             if Base_datos.confirmar_usuario(usuario):
                 salt_guardado = Base_datos.sacar_json_salt(usuario)
-                salt_guardado_descifrado_base64 = Encriptar.desencriptar(bytes.fromhex(salt_guardado), usuario)
-                salt_original = base64.urlsafe_b64decode(salt_guardado_descifrado_base64)
-                
-                token_nuevo = Encriptar.generador_token(usuario, contraseña.encode(), salt_original)
-                token_nuevo_descifrado = Encriptar.desencriptar(token_nuevo, usuario).hex()
-               
+                token_nuevo = Encriptar.generador_token(usuario, contraseña.encode(), salt_guardado)
                 token_guardado = Base_datos.sacar_json_token(usuario)
-                token_guardado_descifrado = Encriptar.desencriptar(bytes.fromhex(token_guardado), usuario).hex()
-                
-                if token_nuevo_descifrado == token_guardado_descifrado:
+
+                if token_nuevo == token_guardado:
                     self.seguir_en_inicio = False
                     inicio_correcto = True
                     self.juego(usuario)
