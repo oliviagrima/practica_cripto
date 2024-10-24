@@ -3,6 +3,12 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import json
 
 class Base_datos:
+
+    def leer_fichero_en_binario():
+        with open("base_de_datos/clientes.json", "rb") as f:
+            fichero = f.read()
+        return fichero
+
     def confirmar_usuario(usuario):
         try:
             with open("base_de_datos/clientes.json", "r") as f:

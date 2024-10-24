@@ -19,8 +19,8 @@ class Aplication:
         
         clave_encriptacion = Encriptar.generador_clave()
         Base_datos.guardar_json_clave(clave_encriptacion)
-        with open("base_de_datos/clientes.json", "rb") as fichero:
-            Encriptar.encriptar(fichero.read())
+        fichero = Base_datos.leer_fichero_en_binario()
+        Encriptar.encriptar(fichero)
 
         while self.seguir_en_inicio:
             try:
@@ -82,14 +82,14 @@ class Aplication:
         salt = Encriptar.generador_salt(usuario)
         token = Encriptar.generador_token(usuario, contraseña.encode(), salt)
 
-        fichero = open("base_de_datos/clientes.json", "r")
-        Encriptar.desencriptar(fichero)
-
-        Base_datos.guardar_json_salt_token(usuario, salt, token)
+        fichero_cifrado = Base_datos.leer_fichero_en_binario()
+        Encriptar.desencriptar(fichero_cifrado)
+        
+        fichero_actualizado = Base_datos.guardar_json_salt_token(usuario, salt, token).encode()
         
         Base_datos.crear_equipo(usuario)
 
-        Encriptar.encriptar(fichero)
+        Encriptar.encriptar(fichero_actualizado)
 
         print("\n----------------------------------------Usuario registrado con éxito----------------------------------------")
 
