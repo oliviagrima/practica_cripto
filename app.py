@@ -74,19 +74,13 @@ class Aplication:
             confirmar_contraseña = getpass.getpass("\nConfirme la contraseña: ")
         
         clave_encriptacion = Encriptar.generador_clave()
-
         Base_datos.guardar_json_clave(usuario, clave_encriptacion)
-
         salt = Encriptar.generador_salt(usuario)
-
         salt_base64 = base64.urlsafe_b64encode(salt)
         salt_cifrado = Encriptar.encriptar(salt_base64, usuario)
-        print(salt_cifrado)
-
         token = Encriptar.generador_token(usuario, contraseña.encode(), salt)
-
         Base_datos.guardar_json_salt_token(usuario, salt_cifrado, token)
-
+        
         Base_datos.crear_equipo(usuario)
 
         print("\n----------------------------------------Usuario registrado con éxito----------------------------------------")
@@ -96,26 +90,20 @@ class Aplication:
         inicio_correcto = False
 
         while not inicio_correcto:
-
             usuario = input("\nIngrese el nombre de usuario: ")
             contraseña = getpass.getpass("\nIngrese la contraseña: ")
 
             if Base_datos.confirmar_usuario(usuario):
-
                 salt_guardado = Base_datos.sacar_json_salt(usuario)
-                
                 salt_guardado_descifrado_base64 = Encriptar.desencriptar(bytes.fromhex(salt_guardado), usuario)
-                
                 salt_original = base64.urlsafe_b64decode(salt_guardado_descifrado_base64)
-
+                
                 token_nuevo = Encriptar.generador_token(usuario, contraseña.encode(), salt_original)
-
                 token_nuevo_descifrado = Encriptar.desencriptar(token_nuevo, usuario).hex()
-                print(token_nuevo_descifrado)
+               
                 token_guardado = Base_datos.sacar_json_token(usuario)
-
                 token_guardado_descifrado = Encriptar.desencriptar(bytes.fromhex(token_guardado), usuario).hex()
-                print(token_guardado_descifrado)
+                
                 if token_nuevo_descifrado == token_guardado_descifrado:
                     self.seguir_en_inicio = False
                     inicio_correcto = True
