@@ -134,21 +134,21 @@ class Aplication:
                 print("\n\t4. Salir")
                 comando = input("\nIngrese el número de la acción que desea realizar: ")
                 if comando == "1":
-                    self.mercado(usuario) 
+                    self.mercado(usuario)               
                 elif comando == "2":
-                    self.equipo(usuario)
+                    self.equipo(usuario) 
                 elif comando == "3":
                     print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tSALDO DISPONIBLE \n------------------------------------------------------------------------------------------------------------")
                     if Base_datos.mostrar_saldo(usuario) > 0:
                         print("Tiene", Base_datos.mostrar_saldo(usuario), "M€")
                         print("------------------------------------------------------------------------------------------------------------")
                     else:
-                        print("\n------------------------------------------No le queda saldo------------------------------------------")
-    
+                        print("\n------------------------------------------No le queda saldo------------------------------------------") 
                 elif comando == "4":
                     print("------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tSALIENDO DEL JUEGO \n------------------------------------------------------------------------------------------------------------")
                     seguir_en_juego = False
                     self.seguir_en_inicio = True
+                
                 else:
                     print("\n---------------------------------------------Comando no válido---------------------------------------------")
                     comando = input("\nPor favor, ingrese un número del 1 al 3: ")
