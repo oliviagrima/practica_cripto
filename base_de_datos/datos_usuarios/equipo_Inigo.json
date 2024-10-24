@@ -1,6 +1,8 @@
 {
     "Inigo": {
-        "saldo": 40,
-        "equipo": []
+        "saldo": 36,
+        "equipo": [
+            "Vini Jr"
+        ]
     }
 }

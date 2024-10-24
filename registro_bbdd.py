@@ -52,7 +52,6 @@ class Base_datos:
                     return True
         except(json.decoder.JSONDecodeError, FileNotFoundError):
             pass
-        f.close()
     
     def guardar_json_clave(clave):
         clave_base64 = base64.urlsafe_b64encode(clave).hex()
@@ -69,8 +68,6 @@ class Base_datos:
 
         with open("base_de_datos/clave_encriptacion.json", "w") as file:
             json.dump(data, file, indent=4)
-        
-        f.close()
 
     def guardar_json_salt_token(usuario, salt, token):
         try:
@@ -87,7 +84,6 @@ class Base_datos:
         with open("base_de_datos/clientes.json", "w") as file:
             json.dump(data, file, indent=4)
         
-        f.close()
 
     def sacar_json_clave():
         with open("base_de_datos/clave_encriptacion.json", "r") as f:
@@ -122,33 +118,19 @@ class Base_datos:
 
         with open(ruta_archivo, "w") as f:
             json.dump(data, f, indent=4)
-        
-        f.close()
-    def crear_equipo(usuario):
-        try:
-            with open("base_de_datos/equipos_usuarios.json", "r") as f:
-                data = json.load(f)
-        except(json.decoder.JSONDecodeError, FileNotFoundError):
-            data = {}
-        
-        if usuario not in data:
-            data[usuario] = {"saldo": 40,
-                             "equipo": []}
-
-        with open("base_de_datos/equipos_usuarios.json", "w") as f:
-            json.dump(data, f, indent=4)
-        
-        f.close()
+    
     
     def mostrar_saldo(usuario):
-        with open("base_de_datos/equipos_usuarios.json", "r") as f:
+        ruta_archivo = f"base_de_datos/datos_usuarios/equipo_{usuario}.json"
+        with open(ruta_archivo, "r") as f:
             data = json.load(f)
             saldo = data[usuario]["saldo"]
         return saldo
 
     def fichar_jugador(usuario, jugador_comprado, precio_jugador):
+        ruta_archivo = f"base_de_datos/datos_usuarios/equipo_{usuario}.json"
         try:
-            with open("base_de_datos/equipos_usuarios.json", "r") as f:
+            with open(ruta_archivo, "r") as f:
                 data = json.load(f)
         except(json.decoder.JSONDecodeError, FileNotFoundError):
             data = {}
@@ -164,14 +146,14 @@ class Base_datos:
                 print("\n---------------------Ya tiene este jugador en tu equipo, no puede volver a comprarlo---------------------")
         else:
             print("\n------------------------No tiene suficiente saldo para fichar a ", jugador_comprado, "------------------------")
-        with open("base_de_datos/equipos_usuarios.json", "w") as f:
+        with open(ruta_archivo, "w") as f:
             json.dump(data, f, indent=4)
         
-        f.close()
 
     def visualizar_equipo(usuario):
-        f = open("base_de_datos/equipos_usuarios.json", "r")
-        with open("base_de_datos/equipos_usuarios.json", "r") as f:
+        ruta_archivo = f"base_de_datos/datos_usuarios/equipo_{usuario}.json"
+        f = open(ruta_archivo, "r")
+        with open(ruta_archivo, "r") as f:
             data = json.load(f)
 
             equipo = data[usuario]["equipo"]
@@ -180,4 +162,3 @@ class Base_datos:
             else:
                 for jugador in equipo:
                     print("\t- ", jugador)
-        f.close()
