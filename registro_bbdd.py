@@ -105,8 +105,8 @@ class Base_datos:
         return token
     
     def crear_carpeta_usuario(usuario):
-        os.makedirs("base_de_datos/datos_usuarios", exist_ok=True)
-        ruta_archivo = f"base_de_datos/datos_usuarios/equipo_{usuario}.json"
+        os.makedirs("base_de_datos/equipos_usuarios", exist_ok=True)
+        ruta_archivo = f"base_de_datos/equipos_usuarios/equipo_{usuario}.json"
 
         try:
             with open(ruta_archivo, "r") as f:
@@ -121,14 +121,14 @@ class Base_datos:
     
     
     def mostrar_saldo(usuario):
-        ruta_archivo = f"base_de_datos/datos_usuarios/equipo_{usuario}.json"
+        ruta_archivo = f"base_de_datos/equipos_usuarios/equipo_{usuario}.json"
         with open(ruta_archivo, "r") as f:
             data = json.load(f)
             saldo = data[usuario]["saldo"]
         return saldo
 
     def fichar_jugador(usuario, jugador_comprado, precio_jugador):
-        ruta_archivo = f"base_de_datos/datos_usuarios/equipo_{usuario}.json"
+        ruta_archivo = f"base_de_datos/equipos_usuarios/equipo_{usuario}.json"
         try:
             with open(ruta_archivo, "r") as f:
                 data = json.load(f)
@@ -151,7 +151,7 @@ class Base_datos:
         
 
     def visualizar_equipo(usuario):
-        ruta_archivo = f"base_de_datos/datos_usuarios/equipo_{usuario}.json"
+        ruta_archivo = f"base_de_datos/equipos_usuarios/equipo_{usuario}.json"
         f = open(ruta_archivo, "r")
         with open(ruta_archivo, "r") as f:
             data = json.load(f)
