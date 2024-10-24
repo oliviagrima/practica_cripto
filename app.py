@@ -3,7 +3,7 @@ from encriptacion import Encriptar
 import getpass
 import random
 
-class Aplication:
+class Aplicacion:
 
     def __init__(self):
         self.seguir_en_inicio = True

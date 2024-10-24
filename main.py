@@ -1,9 +1,9 @@
-from app import Aplication
+from app import Aplicacion
 
 class Main:
     
     def __init__(self):
-        self.app = Aplication()
+        self.app = Aplicacion()
 
     def run(self):
         self.app.inicio()
