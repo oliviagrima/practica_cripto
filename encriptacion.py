@@ -35,21 +35,4 @@ class Encriptar:
     def desencriptar(fichero_cifrado, f):
         fichero = f.decrypt(fichero_cifrado)
         return fichero
-
-    def generador_clave_aes():
-        clave = os.urandom(32)
-        return clave
     
-    def generador_cmac(mensaje, clave):
-        cmac = CMAC(algorithms.AES(clave), backend=default_backend())
-        cmac.update(mensaje)
-        return cmac.finalize()
-    
-    def comprobar_cmac(mensaje, clave, cmac_original):
-        cmac2 = CMAC(algorithms.AES(clave), backend=default_backend())
-        cmac2.update(mensaje)
-        try:
-            cmac2.verify(cmac_original)
-            return True
-        except:
-            return False

@@ -217,8 +217,6 @@ class Aplicacion:
         
     def comprar_jugador(self, usuario, jugadores_aleatorios, precios_jugadores):
         print("\n-----------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tCOMPRAR JUGADOR \n-----------------------------------------------------------------------------------------------------------")
-        
-        clave_aes = Encriptar.generador_clave_aes()
 
         jugador_comprado = input("\nIngrese el nombre del jugador que desea comprar: ")
         compra_de_jugadores = True
@@ -226,23 +224,9 @@ class Aplicacion:
         while compra_de_jugadores:
             if jugador_comprado in jugadores_aleatorios:
                 precio_jugador = precios_jugadores[jugador_comprado]
-
-                mensaje_transaccion = (jugador_comprado + ":" + str(precio_jugador) + "M€").encode()
-                
-                cmac = Encriptar.generador_cmac(mensaje_transaccion, clave_aes)
-                print("CMAC de la transacción generado: ", cmac.hex())
-
-                comprobacion = Encriptar.comprobar_cmac(mensaje_transaccion, clave_aes, cmac)
-
-                if comprobacion:
-                    print("\nTransacción válida. Comprando jugador.")
-                    print("\n------------------------------------Ha comprado a ",jugador_comprado," por",precio_jugador,"M€-------------------------------------")
-                    Base_datos.fichar_jugador(usuario, jugador_comprado, precio_jugador)
-                    compra_de_jugadores = False
-                
-                else:
-                    print("\n---------------------------------------Error en la comprobación del CMAC---------------------------------------")
-                    compra_de_jugadores = False
+                print("\n------------------------------------Ha comprado a ",jugador_comprado," por",precio_jugador,"M€-------------------------------------")
+                Base_datos.fichar_jugador(usuario, jugador_comprado, precio_jugador)
+                compra_de_jugadores = False
             else:
                 print("\n------------------------------------Jugador no disponible en el mercado------------------------------------")
                 jugador_comprado = input("\nIngrese el nombre del jugador que desea comprar: ")
