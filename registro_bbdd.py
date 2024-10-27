@@ -141,6 +141,7 @@ class Base_datos:
             if jugador_comprado not in data[usuario]["equipo"]:
                 data[usuario]["saldo"] -= precio_jugador
                 data[usuario]["equipo"].append(jugador_comprado)
+                print("\n------------------------------------Ha comprado a ",jugador_comprado," por",precio_jugador,"M€-------------------------------------")
             else:
                 print("\n---------------------Ya tiene este jugador en tu equipo, no puede volver a comprarlo---------------------")
         else:

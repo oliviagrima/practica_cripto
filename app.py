@@ -201,14 +201,16 @@ class Aplicacion:
             pregunta_compra = "\n¿DESEA COMPRAR ALGÚN JUGADOR? (si/no): "
             pregunta_compra_cifrada = Encriptar.encriptar_mensaje(clave, pregunta_compra, num_unico)
             print("\nPregunta de compra cifrada: ", pregunta_compra_cifrada)
-            pregunta_compra_descifrada = Encriptar.desencriptar_mensaje(clave, pregunta_compra_cifrada, num_unico)
-            print("\nPregunta de compra descifrada: ", pregunta_compra_descifrada)
-            
+
+            try:
+                pregunta_compra_descifrada = Encriptar.desencriptar_mensaje(clave, pregunta_compra_cifrada, num_unico)
+                print("\nPregunta de compra descifrada: ", pregunta_compra_descifrada)
+            except:
+                print ("\n--------------------------Ha habido un error en la autenticación del mensaje--------------------------")
+                
             print("\n------------------------------------------------------------------------------------------------------------")
 
             respuesta_texto = input(pregunta_compra_descifrada).lower()
-
-            print("\n------------------------------------------------------------------------------------------------------------")
             
             respuesta_compra_cifrada = Encriptar.encriptar_mensaje(clave, respuesta_texto, num_unico)
             print("\nRespuesta de la compra cifrada: ", respuesta_compra_cifrada)
@@ -253,19 +255,46 @@ class Aplicacion:
     def comprar_jugador(self, usuario, jugadores_aleatorios, precios_jugadores):
         print("\n-----------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tCOMPRAR JUGADOR \n-----------------------------------------------------------------------------------------------------------")
 
-        jugador_comprado = input("\nIngrese el nombre del jugador que desea comprar: ")
-        compra_de_jugadores = True
+        clave = Encriptar.generador_clave_chacha20_poly()
+        num_unico = os.urandom(12)
 
-        while compra_de_jugadores:
-            if jugador_comprado in jugadores_aleatorios:
-                precio_jugador = precios_jugadores[jugador_comprado]
+        print("\n------------------------------------------------------------------------------------------------------------")
+        pregunta_jugador = "\nIngrese el nombre del jugador que desea comprar: "
+        pregunta_jugador_cifrada = Encriptar.encriptar_mensaje(clave, pregunta_jugador, num_unico)
+        print("\nPregunta del jugador cifrada: ", pregunta_jugador_cifrada)
 
-                print("\n------------------------------------Ha comprado a ",jugador_comprado," por",precio_jugador,"M€-------------------------------------")
-                Base_datos.fichar_jugador(usuario, jugador_comprado, precio_jugador)
-                compra_de_jugadores = False
-            else:
-                print("\n------------------------------------Jugador no disponible en el mercado------------------------------------")
-                jugador_comprado = input("\nIngrese el nombre del jugador que desea comprar: ")
+        try:
+            pregunta_jugador_descifrada = Encriptar.desencriptar_mensaje(clave, pregunta_jugador_cifrada, num_unico)
+            print("\nPregunta del jugador descifrada: ", pregunta_jugador_descifrada)
+        except:
+            print ("\n--------------------------Ha habido un error en la autenticación del mensaje--------------------------")
+        print("\n------------------------------------------------------------------------------------------------------------") 
+        
+        jugador_comprado = input(pregunta_jugador_descifrada)
+        respuesta_jugador_cifrada = Encriptar.encriptar_mensaje(clave, jugador_comprado, num_unico)
+        print("\nRespuesta del jugador cifrada: ", respuesta_jugador_cifrada)
+
+        try:
+            respuesta_jugador_descifrada = Encriptar.desencriptar_mensaje(clave, respuesta_jugador_cifrada, num_unico)
+            print("\nRespuesta del jugador descifrada: ", respuesta_jugador_descifrada)
+            compra_de_jugadores = True
+            while compra_de_jugadores:
+                if jugador_comprado in jugadores_aleatorios:
+                    precio_jugador = precios_jugadores[jugador_comprado]
+                    Base_datos.fichar_jugador(usuario, jugador_comprado, precio_jugador)
+                    compra_de_jugadores = False
+                else:
+                    print("\n------------------------------------Jugador no disponible en el mercado------------------------------------")
+                    jugador_comprado = input("\nIngrese el nombre del jugador que desea comprar: ")
+                    respuesta_jugador_cifrada = Encriptar.encriptar_mensaje(clave, jugador_comprado, num_unico)
+                    print("\nRespuesta del jugador cifrada: ", respuesta_jugador_cifrada)
+                    try:
+                        respuesta_jugador_descifrada = Encriptar.desencriptar_mensaje(clave, respuesta_jugador_cifrada, num_unico)
+                        print("\nRespuesta del jugador descifrada: ", respuesta_jugador_descifrada)
+                    except:
+                        print ("\n--------------------------Ha habido un error en la autenticación del mensaje--------------------------")
+        except:
+            print ("\n--------------------------Ha habido un error en la autenticación del mensaje--------------------------")
     
     def equipo(self, usuario):
         print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tTU EQUIPO \n------------------------------------------------------------------------------------------------------------")
