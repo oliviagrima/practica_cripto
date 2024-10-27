@@ -196,14 +196,20 @@ class Aplicacion:
         while not acabar_pregunta:
             saldo_usuario = Base_datos.mostrar_saldo(usuario)
             print("\nSaldo disponible: ", saldo_usuario, "M€")
+            print("\n------------------------------------------------------------------------------------------------------------")
             
-            pregunta_compra = "¿DESEA COMPRAR ALGÚN JUGADOR? (si/no): "
+            pregunta_compra = "\n¿DESEA COMPRAR ALGÚN JUGADOR? (si/no): "
             pregunta_compra_cifrada = Encriptar.encriptar_mensaje(clave, pregunta_compra, num_unico)
             print("\nPregunta de compra cifrada: ", pregunta_compra_cifrada)
             pregunta_compra_descifrada = Encriptar.desencriptar_mensaje(clave, pregunta_compra_cifrada, num_unico)
             print("\nPregunta de compra descifrada: ", pregunta_compra_descifrada)
             
-            respuesta_texto = input("\nIngrese su respuesta (si o no): ").lower()
+            print("\n------------------------------------------------------------------------------------------------------------")
+
+            respuesta_texto = input(pregunta_compra_descifrada).lower()
+
+            print("\n------------------------------------------------------------------------------------------------------------")
+            
             respuesta_compra_cifrada = Encriptar.encriptar_mensaje(clave, respuesta_texto, num_unico)
             print("\nRespuesta de la compra cifrada: ", respuesta_compra_cifrada)
 
