@@ -224,6 +224,7 @@ class Aplicacion:
         while compra_de_jugadores:
             if jugador_comprado in jugadores_aleatorios:
                 precio_jugador = precios_jugadores[jugador_comprado]
+
                 print("\n------------------------------------Ha comprado a ",jugador_comprado," por",precio_jugador,"M€-------------------------------------")
                 Base_datos.fichar_jugador(usuario, jugador_comprado, precio_jugador)
                 compra_de_jugadores = False

@@ -1,8 +1,9 @@
 {
     "Olivia": {
-        "saldo": 37,
+        "saldo": 35,
         "equipo": [
-            "Modric"
+            "Modric",
+            "Rudiger"
         ]
     }
 }
