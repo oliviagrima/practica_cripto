@@ -1,9 +1,11 @@
 {
     "Olivia": {
-        "saldo": 35,
+        "saldo": 29,
         "equipo": [
             "Modric",
-            "Rudiger"
+            "Rudiger",
+            "Carvajal",
+            "Vini Jr"
         ]
     }
 }

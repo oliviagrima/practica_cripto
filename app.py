@@ -198,7 +198,7 @@ class Aplicacion:
             print("\nSaldo disponible: ", saldo_usuario, "M€")
             print("\n------------------------------------------------------------------------------------------------------------")
             
-            pregunta_compra = "\n¿DESEA COMPRAR ALGÚN JUGADOR? (si/no): "
+            pregunta_compra = "¿DESEA COMPRAR ALGÚN JUGADOR? (si/no): "
             pregunta_compra_cifrada = Encriptar.encriptar_mensaje(clave, pregunta_compra, num_unico)
             print("\nPregunta de compra cifrada: ", pregunta_compra_cifrada)
 
@@ -208,7 +208,7 @@ class Aplicacion:
             except:
                 print ("\n--------------------------Ha habido un error en la autenticación del mensaje--------------------------")
                 
-            print("\n------------------------------------------------------------------------------------------------------------")
+            print("\n------------------------------------------------------------------------------------------------------------\n")
 
             respuesta_texto = input(pregunta_compra_descifrada).lower()
             
@@ -258,8 +258,7 @@ class Aplicacion:
         clave = Encriptar.generador_clave_chacha20_poly()
         num_unico = os.urandom(12)
 
-        print("\n------------------------------------------------------------------------------------------------------------")
-        pregunta_jugador = "\nIngrese el nombre del jugador que desea comprar: "
+        pregunta_jugador = "Ingrese el nombre del jugador que desea comprar: "
         pregunta_jugador_cifrada = Encriptar.encriptar_mensaje(clave, pregunta_jugador, num_unico)
         print("\nPregunta del jugador cifrada: ", pregunta_jugador_cifrada)
 
@@ -268,7 +267,8 @@ class Aplicacion:
             print("\nPregunta del jugador descifrada: ", pregunta_jugador_descifrada)
         except:
             print ("\n--------------------------Ha habido un error en la autenticación del mensaje--------------------------")
-        print("\n------------------------------------------------------------------------------------------------------------") 
+        
+        print("\n------------------------------------------------------------------------------------------------------------\n") 
         
         jugador_comprado = input(pregunta_jugador_descifrada)
         respuesta_jugador_cifrada = Encriptar.encriptar_mensaje(clave, jugador_comprado, num_unico)
