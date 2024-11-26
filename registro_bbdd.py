@@ -213,4 +213,34 @@ class Base_datos:
         with open(ruta_archivo, "w") as f:
             json.dump(data, f, indent=4)
 
+    def guardar_json_claves_ACs(nombre_ac, clave_privada, clave_publica, certificado):
+        private_pem = clave_privada.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption()
+        )
+
+        public_pem = clave_publica.public_bytes(	
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+
+        certificado_pem = certificado.public_bytes(
+            encoding=serialization.Encoding.PEM
+        )
+
+        os.makedirs("base_de_datos/claves_ACs", exist_ok=True)
+        ruta_archivo = f"base_de_datos/claves_ACs/claves_{nombre_ac}.json"
+
+        try:
+            with open(ruta_archivo, "r") as f:
+                data = json.load(f)
+        except(json.decoder.JSONDecodeError, FileNotFoundError):
+            data = {}
+            data[nombre_ac] = {"clave_publica": public_pem.decode(),
+                             "clave_privada": private_pem.decode(),
+                             "certificado": certificado_pem.decode()}
+
+        with open(ruta_archivo, "w") as f:
+            json.dump(data, f, indent=4)
         

@@ -19,6 +19,15 @@ class Aplicacion:
         
         clave_encriptacion = Encriptar.generador_clave()
         Base_datos.guardar_json_clave(clave_encriptacion)
+        clave_privada_raiz, clave_publica_raiz, certificado_raiz = Encriptar.generador_certificado_raiz()
+        Base_datos.guardar_json_claves_ACs("Florentino Pérez", clave_privada_raiz, clave_publica_raiz, certificado_raiz)
+
+        clave_privada_ancelotti, clave_publica_ancelotti, certificado_ancelotti = Encriptar.generador_certificado_intermedio1(clave_privada_raiz, certificado_raiz)
+        Base_datos.guardar_json_claves_ACs("Carlo Ancelotti", clave_privada_ancelotti, clave_publica_ancelotti, certificado_ancelotti)
+
+        clave_privada_butragueño, clave_publica_butragueño, certificado_butragueño = Encriptar.generador_certificado_intermedio2(clave_privada_raiz, certificado_raiz)
+        Base_datos.guardar_json_claves_ACs("Emilio Butragueño", clave_privada_butragueño, clave_publica_butragueño, certificado_butragueño)
+
         clave_privada, clave_publica = Encriptar.generador_claves()
         Base_datos.guardar_json_claves_servidor(clave_privada, clave_publica)
 
