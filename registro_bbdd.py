@@ -1,5 +1,6 @@
 import base64
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import serialization
 import json
 from encriptacion import Encriptar
 from cryptography.fernet import Fernet
@@ -104,7 +105,7 @@ class Base_datos:
             token = data[usuario]["token"]
         return token
     
-    def crear_carpeta_usuario(usuario):
+    def crear_carpeta_equipo_usuario(usuario):
         os.makedirs("base_de_datos/equipos_usuarios", exist_ok=True)
         ruta_archivo = f"base_de_datos/equipos_usuarios/equipo_{usuario}.json"
 
@@ -162,3 +163,54 @@ class Base_datos:
             else:
                 for jugador in equipo:
                     print("\t- ", jugador)
+
+    def guardar_json_claves_servidor(clave_privada, clave_publica):
+        private_pem = clave_privada.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption()
+        )
+
+        public_pem = clave_publica.public_bytes(	
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+
+        try:
+            with open("base_de_datos/claves_servidor.json", "r") as f:
+                data = json.load(f)
+        except(json.decoder.JSONDecodeError, FileNotFoundError):
+            data = {}
+            data["clave_publica"] = public_pem.decode()
+            data["clave_privada"] = private_pem.decode()
+
+        with open("base_de_datos/claves_servidor.json", "w") as f:
+            json.dump(data, f, indent=4)
+
+    def guardar_json_claves_usuario(usuario, clave_privada, clave_publica):
+        private_pem = clave_privada.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption()
+        )
+
+        public_pem = clave_publica.public_bytes(	
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+
+        os.makedirs("base_de_datos/claves_usuarios", exist_ok=True)
+        ruta_archivo = f"base_de_datos/claves_usuarios/claves_{usuario}.json"
+
+        try:
+            with open(ruta_archivo, "r") as f:
+                data = json.load(f)
+        except(json.decoder.JSONDecodeError, FileNotFoundError):
+            data = {}
+            data[usuario] = {"clave_publica": public_pem.decode(),
+                             "clave_privada": private_pem.decode()}
+
+        with open(ruta_archivo, "w") as f:
+            json.dump(data, f, indent=4)
+
+        

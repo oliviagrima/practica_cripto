@@ -4,6 +4,11 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography import x509
+from cryptography.x509.oid import NameOID
+from cryptography.hazmat.primitives import hashes
+
 
 class Encriptar:
 
@@ -46,3 +51,13 @@ class Encriptar:
         chacha = ChaCha20Poly1305(clave)
         mensaje_descifrado = chacha.decrypt(num_unico, mensaje_cifrado, None)
         return mensaje_descifrado.decode()
+
+    def generador_claves():
+        clave_privada = rsa.generate_private_key(
+            public_exponent=65537,
+            key_size=2048,
+        )
+
+        clave_publica = clave_privada.public_key()
+
+        return clave_privada, clave_publica

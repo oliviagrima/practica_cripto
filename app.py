@@ -19,6 +19,8 @@ class Aplicacion:
         
         clave_encriptacion = Encriptar.generador_clave()
         Base_datos.guardar_json_clave(clave_encriptacion)
+        clave_privada, clave_publica = Encriptar.generador_claves()
+        Base_datos.guardar_json_claves_servidor(clave_privada, clave_publica)
 
         if not Base_datos.comprobar_fichero_encriptado() or Base_datos.comprobar_fichero_vacio():
             Base_datos.encriptar_fichero()
@@ -82,12 +84,15 @@ class Aplicacion:
         
         salt = Encriptar.generador_salt(usuario)
         token = Encriptar.generador_token(usuario, contraseña.encode(), salt)
+        clave_privada, clave_publica = Encriptar.generador_claves()
+
+        Base_datos.guardar_json_claves_usuario(usuario, clave_privada, clave_publica)
 
         Base_datos.desencriptar_fichero()
 
         Base_datos.guardar_json_salt_token(usuario, salt, token)
         
-        Base_datos.crear_carpeta_usuario(usuario)
+        Base_datos.crear_carpeta_equipo_usuario(usuario)
 
         Base_datos.encriptar_fichero()
 
