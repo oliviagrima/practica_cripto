@@ -20,16 +20,16 @@ class Aplicacion:
         clave_encriptacion = Encriptar.generador_clave()
         Base_datos.guardar_json_clave(clave_encriptacion)
         clave_privada_raiz, clave_publica_raiz, certificado_raiz = Encriptar.generador_certificado_raiz()
-        Base_datos.guardar_json_claves_ACs("Florentino Pérez", clave_privada_raiz, clave_publica_raiz, certificado_raiz)
+        Base_datos.guardar_json_claves_ACs("FlorentinoPerez", clave_privada_raiz, clave_publica_raiz, certificado_raiz)
 
         clave_privada_ancelotti, clave_publica_ancelotti, certificado_ancelotti = Encriptar.generador_certificado_intermedio1(clave_privada_raiz, certificado_raiz)
-        Base_datos.guardar_json_claves_ACs("Carlo Ancelotti", clave_privada_ancelotti, clave_publica_ancelotti, certificado_ancelotti)
+        Base_datos.guardar_json_claves_ACs("CarloAncelotti", clave_privada_ancelotti, clave_publica_ancelotti, certificado_ancelotti)
 
         clave_privada_butragueño, clave_publica_butragueño, certificado_butragueño = Encriptar.generador_certificado_intermedio2(clave_privada_raiz, certificado_raiz)
-        Base_datos.guardar_json_claves_ACs("Emilio Butragueño", clave_privada_butragueño, clave_publica_butragueño, certificado_butragueño)
+        Base_datos.guardar_json_claves_ACs("EmilioButragueno", clave_privada_butragueño, clave_publica_butragueño, certificado_butragueño)
 
-        clave_privada, clave_publica = Encriptar.generador_claves()
-        Base_datos.guardar_json_claves_servidor(clave_privada, clave_publica)
+        clave_privada_servidor, clave_publica_servidor, certificado_servidor = Encriptar.generador_certificado_servidor(clave_privada_butragueño, certificado_butragueño)
+        Base_datos.guardar_json_claves_servidor(clave_privada_servidor, clave_publica_servidor, certificado_servidor)
 
         if not Base_datos.comprobar_fichero_encriptado() or Base_datos.comprobar_fichero_vacio():
             Base_datos.encriptar_fichero()
@@ -93,9 +93,11 @@ class Aplicacion:
         
         salt = Encriptar.generador_salt(usuario)
         token = Encriptar.generador_token(usuario, contraseña.encode(), salt)
-        clave_privada, clave_publica = Encriptar.generador_claves()
 
-        Base_datos.guardar_json_claves_usuario(usuario, clave_privada, clave_publica)
+        clave_privada_ancelotti, certificado_ancelotti = Base_datos.sacar_claves_ancelotti()
+        clave_privada_cliente, clave_publica_cliente, certificado_cliente = Encriptar.generador_certificado_cliente(usuario, clave_privada_ancelotti, certificado_ancelotti)
+
+        Base_datos.guardar_json_claves_usuario(usuario, clave_privada_cliente, clave_publica_cliente, certificado_cliente)
 
         Base_datos.desencriptar_fichero()
 

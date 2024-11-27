@@ -1,6 +1,8 @@
 import base64
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import serialization
+from cryptography import x509
+from cryptography.x509 import load_pem_x509_certificate
 import json
 from encriptacion import Encriptar
 from cryptography.fernet import Fernet
@@ -164,7 +166,7 @@ class Base_datos:
                 for jugador in equipo:
                     print("\t- ", jugador)
 
-    def guardar_json_claves_servidor(clave_privada, clave_publica):
+    def guardar_json_claves_servidor(clave_privada, clave_publica, certificado):
         private_pem = clave_privada.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.TraditionalOpenSSL,
@@ -174,6 +176,10 @@ class Base_datos:
         public_pem = clave_publica.public_bytes(	
             encoding=serialization.Encoding.PEM,
             format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+
+        certificado_pem = certificado.public_bytes(
+            encoding=serialization.Encoding.PEM 
         )
 
         try:
@@ -183,11 +189,12 @@ class Base_datos:
             data = {}
             data["clave_publica"] = public_pem.decode()
             data["clave_privada"] = private_pem.decode()
+            data["certificado"] = certificado_pem.decode()
 
         with open("base_de_datos/claves_servidor.json", "w") as f:
             json.dump(data, f, indent=4)
 
-    def guardar_json_claves_usuario(usuario, clave_privada, clave_publica):
+    def guardar_json_claves_usuario(usuario, clave_privada, clave_publica, certificado):
         private_pem = clave_privada.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.TraditionalOpenSSL,
@@ -197,6 +204,10 @@ class Base_datos:
         public_pem = clave_publica.public_bytes(	
             encoding=serialization.Encoding.PEM,
             format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+
+        certificado_pem = certificado.public_bytes(
+            encoding=serialization.Encoding.PEM
         )
 
         os.makedirs("base_de_datos/claves_usuarios", exist_ok=True)
@@ -208,7 +219,8 @@ class Base_datos:
         except(json.decoder.JSONDecodeError, FileNotFoundError):
             data = {}
             data[usuario] = {"clave_publica": public_pem.decode(),
-                             "clave_privada": private_pem.decode()}
+                             "clave_privada": private_pem.decode(),
+                             "certificado": certificado_pem.decode()}
 
         with open(ruta_archivo, "w") as f:
             json.dump(data, f, indent=4)
@@ -243,4 +255,12 @@ class Base_datos:
 
         with open(ruta_archivo, "w") as f:
             json.dump(data, f, indent=4)
+
+    def sacar_claves_ancelotti():
+        with open("base_de_datos/claves_ACs/claves_CarloAncelotti.json", "r") as f:
+            data = json.load(f)
+            clave_privada = serialization.load_pem_private_key(data["CarloAncelotti"]["clave_privada"].encode(), password=None)
+            certificado = load_pem_x509_certificate(data["CarloAncelotti"]["certificado"].encode())
+        return clave_privada, certificado
+    
         

@@ -11,6 +11,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat, NoEncryption
 from datetime import datetime, timedelta, timezone
 import datetime
+import json
 
 class Encriptar:
 
@@ -65,12 +66,7 @@ class Encriptar:
         return clave_privada, clave_publica
     
     def generador_certificado_raiz():
-        clave_privada_raiz = rsa.generate_private_key(
-            public_exponent=65537,
-            key_size=2048,
-        )
-
-        clave_publica_raiz = clave_privada_raiz.public_key()
+        clave_privada_raiz, clave_publica_raiz = Encriptar.generador_claves()
 
         sujeto = ac_raiz = x509.Name([
             x509.NameAttribute(NameOID.COUNTRY_NAME, u"ES"),
@@ -117,11 +113,7 @@ class Encriptar:
     
     def generador_certificado_intermedio1(clave_privada_raiz, certificado_raiz):
         
-        clave_privada_ancelotti = rsa.generate_private_key(
-            public_exponent=65537, 
-            key_size=2048,
-        )
-        clave_publica_ancelotti = clave_privada_ancelotti.public_key()
+        clave_privada_ancelotti, clave_publica_ancelotti = Encriptar.generador_claves()
 
         sujeto = x509.Name([
             x509.NameAttribute(NameOID.COUNTRY_NAME, u"ES"),
@@ -170,11 +162,7 @@ class Encriptar:
     
     def generador_certificado_intermedio2(clave_privada_raiz, certificado_raiz):
         
-        clave_privada_butragueño = rsa.generate_private_key(
-            public_exponent=65537, 
-            key_size=2048,
-        )
-        clave_publica_butragueño = clave_privada_butragueño.public_key()
+        clave_privada_butragueño, clave_publica_butragueño = Encriptar.generador_claves()
 
         sujeto = x509.Name([
             x509.NameAttribute(NameOID.COUNTRY_NAME, u"ES"),
@@ -220,5 +208,129 @@ class Encriptar:
         ).sign(clave_privada_raiz, hashes.SHA256())
 
         return clave_privada_butragueño, clave_publica_butragueño, certificado_butragueño
+    
+    def generador_certificado_servidor(clave_privada_butragueño, certificado_butragueño):
+            
+        clave_privada_servidor, clave_publica_servidor = Encriptar.generador_claves()
+
+        sujeto = x509.Name([
+            x509.NameAttribute(NameOID.COUNTRY_NAME, u"ES"),
+            x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"Comunidad de Madrid"),
+            x509.NameAttribute(NameOID.LOCALITY_NAME, u"Colmenarejo"),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"AC Madrid Stars"),
+            x509.NameAttribute(NameOID.COMMON_NAME, u"AC Madrid Stars Firmada"),
+        ])
+
+        certificado_servidor = x509.CertificateBuilder().subject_name(
+            sujeto
+        ).issuer_name(
+            certificado_butragueño.subject
+        ).public_key(
+            clave_publica_servidor
+        ).serial_number(
+            x509.random_serial_number()
+        ).not_valid_before(
+            datetime.datetime.now(datetime.timezone.utc)
+        ).not_valid_after(
+            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=3650)
+        ).add_extension(
+            x509.BasicConstraints(ca=False, path_length=None), 
+            critical=True,
+        ).add_extension(
+            x509.KeyUsage(
+                digital_signature=True,
+                content_commitment=False,
+                key_encipherment=True,
+                data_encipherment=False,
+                key_agreement=False,
+                key_cert_sign=False,
+                crl_sign=True,
+                encipher_only=False,
+                decipher_only=False,
+            ),
+            critical=True,
+        ).add_extension(
+            x509.SubjectAlternativeName([
+                x509.DNSName(u"localhost"),
+            ]),
+            critical=False,
+        ).add_extension(
+            x509.ExtendedKeyUsage([
+                x509.oid.ExtendedKeyUsageOID.SERVER_AUTH,
+            ]),
+            critical=False,
+        ).add_extension(
+            x509.SubjectKeyIdentifier.from_public_key(clave_publica_servidor),
+            critical=False,
+        ).add_extension(
+            x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
+                certificado_butragueño.extensions.get_extension_for_class(x509.SubjectKeyIdentifier).value
+            ),
+            critical=False,
+        ).sign(clave_privada_butragueño, hashes.SHA256())
+
+        return clave_privada_servidor, clave_publica_servidor, certificado_servidor
+                    
+    def generador_certificado_cliente(usuario, clave_privada_ancelotti, certificado_ancelotti):
+
+        clave_privada_cliente, clave_publica_cliente = Encriptar.generador_claves()
+
+        sujeto = x509.Name([
+            x509.NameAttribute(NameOID.COUNTRY_NAME, u"ES"),
+            x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"Comunidad de Madrid"),
+            x509.NameAttribute(NameOID.LOCALITY_NAME, u"Colmenarejo"),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"AC Madrid Stars"),
+            x509.NameAttribute(NameOID.COMMON_NAME, f"{usuario}"),
+        ])
+
+        certificado_cliente = x509.CertificateBuilder().subject_name(
+            sujeto
+        ).issuer_name(
+            certificado_ancelotti.subject
+        ).public_key(
+            clave_publica_cliente
+        ).serial_number(
+            x509.random_serial_number()
+        ).not_valid_before(
+            datetime.datetime.now(datetime.timezone.utc)
+        ).not_valid_after(
+            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=3650)
+        ).add_extension(
+            x509.BasicConstraints(ca=False, path_length=None), 
+            critical=True,
+        ).add_extension(
+            x509.KeyUsage(
+                digital_signature=True,
+                content_commitment=False,
+                key_encipherment=True,
+                data_encipherment=False,
+                key_agreement=False,
+                key_cert_sign=False,
+                crl_sign=True,
+                encipher_only=False,
+                decipher_only=False,
+            ),
+            critical=True,
+        ).add_extension(
+            x509.SubjectAlternativeName([
+                x509.DNSName(u"localhost"),
+            ]),
+            critical=False,
+        ).add_extension(
+            x509.ExtendedKeyUsage([
+                x509.oid.ExtendedKeyUsageOID.CLIENT_AUTH,
+            ]),
+            critical=False,
+        ).add_extension(
+            x509.SubjectKeyIdentifier.from_public_key(clave_publica_cliente),
+            critical=False,
+        ).add_extension(
+            x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
+                certificado_ancelotti.extensions.get_extension_for_class(x509.SubjectKeyIdentifier).value
+            ),
+            critical=False,
+        ).sign(clave_privada_ancelotti, hashes.SHA256())
+
+        return clave_privada_cliente, clave_publica_cliente, certificado_cliente
     
     
