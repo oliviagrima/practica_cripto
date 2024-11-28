@@ -263,4 +263,14 @@ class Base_datos:
             certificado = load_pem_x509_certificate(data["FlorentinoPerez"]["certificado"].encode())
         return clave_privada, certificado
     
-        
+    def extraer_certificado_cliente(usuario):
+        with open("base_de_datos/claves_usuarios/claves_{usuario}.json", "r") as f:
+            data = json.load(f)
+            certificado_cliente = load_pem_x509_certificate(data["cliente"]["certificado"].encode())
+        return certificado_cliente
+    
+    def extraer_certificado_servidor():
+        with open("base_de_datos/claves_servidor.json", "r") as f:
+            data = json.load(f)
+            certificado_servidor = load_pem_x509_certificate(data["certificado"].encode())
+        return certificado_servidor

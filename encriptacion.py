@@ -8,10 +8,9 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography import x509
 from cryptography.x509.oid import NameOID
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat, NoEncryption
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 import datetime
-import json
+from cryptography.hazmat.primitives import padding
 
 class Encriptar:
 
@@ -332,5 +331,33 @@ class Encriptar:
         ).sign(clave_privada_intermedio_usuarios, hashes.SHA256())
 
         return clave_privada_cliente, clave_publica_cliente, certificado_cliente
+    
+    def verificar_certificado(certificado_emisor, certificado):
+        try:
+            certificado_emisor.public_key().verify(
+                certificado.signature,
+                certificado.tbs_certificate_bytes,
+                padding.PKCS1v15(),
+                certificado.signature_hash_algorithm,
+            )
+
+        except:
+            print("La firma del certificado no es válida")
+            return False
+        
+        ahora = datetime.datetime.now(datetime.timezone.utc)
+        if not (certificado.not_valid_before <= ahora <= certificado.not_valid_after):
+            print("El certificado está fuera del periodo de validez")
+            return False
+
+        try:
+            basic_constraints = certificado.extensions.get_extension_for_class(x509.BasicConstraints).value
+            if basic_constraints.ca:
+                print("El certificado no puede ser de una CA")
+                return False
+
+
+        
+
     
     

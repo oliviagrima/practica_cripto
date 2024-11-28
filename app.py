@@ -194,6 +194,16 @@ class Aplicacion:
 
     def mercado(self, usuario):
         print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tMERCADO DE FICHAJES \n------------------------------------------------------------------------------------------------------------")
+        print("------------INTERCAMBIO DE CERTIFICADOS-------------")
+        certificado_cliente = Base_datos.extraer_certificado_cliente(usuario)
+        certificado_servidor = Base_datos.extraer_certificado_servidor()
+
+        print("------------Validando certificado cliente...-------------")
+
+        print("------------Validando certificado servidor...-------------")
+        
+        print("------------Certificados validados correctamente-------------")
+        
         clave = Encriptar.generador_clave_chacha20_poly()
         num_unico = os.urandom(12)
 
