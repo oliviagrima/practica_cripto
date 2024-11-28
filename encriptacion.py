@@ -72,8 +72,8 @@ class Encriptar:
             x509.NameAttribute(NameOID.COUNTRY_NAME, u"ES"),
             x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"Comunidad de Madrid"),
             x509.NameAttribute(NameOID.LOCALITY_NAME, u"Madrid"),
-            x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"AC Florentino Pérez"),
-            x509.NameAttribute(NameOID.COMMON_NAME, u"AC Florentino Pérez Autofirmada"),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"AC La Liga"),
+            x509.NameAttribute(NameOID.COMMON_NAME, u"AC La Liga Autofirmada"),
         ])
 
         certificado_raiz = x509.CertificateBuilder().subject_name(
@@ -111,24 +111,24 @@ class Encriptar:
         
         return clave_privada_raiz, clave_publica_raiz, certificado_raiz
     
-    def generador_certificado_intermedio1(clave_privada_raiz, certificado_raiz):
+    def generador_certificado_intermedio_usuarios(clave_privada_raiz, certificado_raiz):
         
-        clave_privada_ancelotti, clave_publica_ancelotti = Encriptar.generador_claves()
+        clave_privada_intermedio_usuarios, clave_publica_intermedio_usuarios = Encriptar.generador_claves()
 
         sujeto = x509.Name([
             x509.NameAttribute(NameOID.COUNTRY_NAME, u"ES"),
             x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"Comunidad de Madrid"),
             x509.NameAttribute(NameOID.LOCALITY_NAME, u"Madrid"),
-            x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"AC Carlo Ancelotti"),
-            x509.NameAttribute(NameOID.COMMON_NAME, u"AC Carlo Ancelotti Firmada"),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"AC Florentino Pérez"),
+            x509.NameAttribute(NameOID.COMMON_NAME, u"AC Florentino Pérez Firmada"),
         ])
 
-        certificado_ancelotti = x509.CertificateBuilder().subject_name(
+        certificado_intermedio_usuarios = x509.CertificateBuilder().subject_name(
             sujeto
         ).issuer_name(
             certificado_raiz.subject
         ).public_key(
-            clave_publica_ancelotti
+            clave_publica_intermedio_usuarios
         ).serial_number(
             x509.random_serial_number()
         ).not_valid_before(
@@ -151,33 +151,33 @@ class Encriptar:
             ),
             critical=True,
         ).add_extension(
-            x509.SubjectKeyIdentifier.from_public_key(clave_publica_ancelotti),
+            x509.SubjectKeyIdentifier.from_public_key(clave_publica_intermedio_usuarios),
             critical=False,
         ).add_extension(
             x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(certificado_raiz.extensions.get_extension_for_class(x509.SubjectKeyIdentifier).value),
             critical=False,
         ).sign(clave_privada_raiz, hashes.SHA256())
 
-        return clave_privada_ancelotti, clave_publica_ancelotti, certificado_ancelotti
+        return clave_privada_intermedio_usuarios, clave_publica_intermedio_usuarios, certificado_intermedio_usuarios
     
-    def generador_certificado_intermedio2(clave_privada_raiz, certificado_raiz):
+    def generador_certificado_intermedio_servidor(clave_privada_raiz, certificado_raiz):
         
-        clave_privada_butragueño, clave_publica_butragueño = Encriptar.generador_claves()
+        clave_privada_intermedio_servidor, clave_publica_intermedio_servidor = Encriptar.generador_claves()
 
         sujeto = x509.Name([
             x509.NameAttribute(NameOID.COUNTRY_NAME, u"ES"),
             x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"Comunidad de Madrid"),
             x509.NameAttribute(NameOID.LOCALITY_NAME, u"Madrid"),
-            x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"AC Emilio Butragueño"),
-            x509.NameAttribute(NameOID.COMMON_NAME, u"AC Emilio Butragueño Firmada"),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"AC Javier Tebas"),
+            x509.NameAttribute(NameOID.COMMON_NAME, u"AC Javier Tebas Firmada"),
         ])
 
-        certificado_butragueño = x509.CertificateBuilder().subject_name(
+        certificado_intermedio_servidor = x509.CertificateBuilder().subject_name(
             sujeto
         ).issuer_name(
             certificado_raiz.subject
         ).public_key(
-            clave_publica_butragueño
+            clave_publica_intermedio_servidor
         ).serial_number(
             x509.random_serial_number()
         ).not_valid_before(
@@ -200,16 +200,16 @@ class Encriptar:
             ),
             critical=True,
         ).add_extension(
-            x509.SubjectKeyIdentifier.from_public_key(clave_publica_butragueño),
+            x509.SubjectKeyIdentifier.from_public_key(clave_publica_intermedio_servidor),
             critical=False,
         ).add_extension(
             x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(certificado_raiz.extensions.get_extension_for_class(x509.SubjectKeyIdentifier).value),
             critical=False,
         ).sign(clave_privada_raiz, hashes.SHA256())
 
-        return clave_privada_butragueño, clave_publica_butragueño, certificado_butragueño
+        return clave_privada_intermedio_servidor, clave_publica_intermedio_servidor, certificado_intermedio_servidor
     
-    def generador_certificado_servidor(clave_privada_butragueño, certificado_butragueño):
+    def generador_certificado_servidor(clave_privada_intermedio_servidor, certificado_intermedio_servidor):
             
         clave_privada_servidor, clave_publica_servidor = Encriptar.generador_claves()
 
@@ -224,7 +224,7 @@ class Encriptar:
         certificado_servidor = x509.CertificateBuilder().subject_name(
             sujeto
         ).issuer_name(
-            certificado_butragueño.subject
+            certificado_intermedio_servidor.subject
         ).public_key(
             clave_publica_servidor
         ).serial_number(
@@ -264,14 +264,14 @@ class Encriptar:
             critical=False,
         ).add_extension(
             x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
-                certificado_butragueño.extensions.get_extension_for_class(x509.SubjectKeyIdentifier).value
+                certificado_intermedio_servidor.extensions.get_extension_for_class(x509.SubjectKeyIdentifier).value
             ),
             critical=False,
-        ).sign(clave_privada_butragueño, hashes.SHA256())
+        ).sign(clave_privada_intermedio_servidor, hashes.SHA256())
 
         return clave_privada_servidor, clave_publica_servidor, certificado_servidor
                     
-    def generador_certificado_cliente(usuario, clave_privada_ancelotti, certificado_ancelotti):
+    def generador_certificado_cliente(usuario, clave_privada_intermedio_usuarios, certificado_intermedio_usuarios):
 
         clave_privada_cliente, clave_publica_cliente = Encriptar.generador_claves()
 
@@ -286,7 +286,7 @@ class Encriptar:
         certificado_cliente = x509.CertificateBuilder().subject_name(
             sujeto
         ).issuer_name(
-            certificado_ancelotti.subject
+            certificado_intermedio_usuarios.subject
         ).public_key(
             clave_publica_cliente
         ).serial_number(
@@ -326,10 +326,10 @@ class Encriptar:
             critical=False,
         ).add_extension(
             x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
-                certificado_ancelotti.extensions.get_extension_for_class(x509.SubjectKeyIdentifier).value
+                certificado_intermedio_usuarios.extensions.get_extension_for_class(x509.SubjectKeyIdentifier).value
             ),
             critical=False,
-        ).sign(clave_privada_ancelotti, hashes.SHA256())
+        ).sign(clave_privada_intermedio_usuarios, hashes.SHA256())
 
         return clave_privada_cliente, clave_publica_cliente, certificado_cliente
     

@@ -256,11 +256,11 @@ class Base_datos:
         with open(ruta_archivo, "w") as f:
             json.dump(data, f, indent=4)
 
-    def sacar_claves_ancelotti():
-        with open("base_de_datos/claves_ACs/claves_CarloAncelotti.json", "r") as f:
+    def sacar_claves_intermedio_usuarios():
+        with open("base_de_datos/claves_ACs/claves_FlorentinoPerez.json", "r") as f:
             data = json.load(f)
-            clave_privada = serialization.load_pem_private_key(data["CarloAncelotti"]["clave_privada"].encode(), password=None)
-            certificado = load_pem_x509_certificate(data["CarloAncelotti"]["certificado"].encode())
+            clave_privada = serialization.load_pem_private_key(data["FlorentinoPerez"]["clave_privada"].encode(), password=None)
+            certificado = load_pem_x509_certificate(data["FlorentinoPerez"]["certificado"].encode())
         return clave_privada, certificado
     
         
