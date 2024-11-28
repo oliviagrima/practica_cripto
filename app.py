@@ -195,7 +195,7 @@ class Aplicacion:
     def mercado(self, usuario):
         seguir_en_mercado = True
         print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tMERCADO DE FICHAJES \n------------------------------------------------------------------------------------------------------------")
-        print("\n-------------INTERCAMBIO DE CERTIFICADOS-------------")
+        print("\n---------------INTERCAMBIO DE CERTIFICADOS---------------")
         certificado_cliente = Base_datos.extraer_certificado_cliente(usuario)
         certificado_servidor = Base_datos.extraer_certificado_servidor()
         certificado_intermedio_usuarios = Base_datos.sacar_claves_intermedio_usuarios()[1]
@@ -211,7 +211,7 @@ class Aplicacion:
         else:
             seguir_en_mercado = False
         
-        print("\n------------Validando certificado servidor...-------------")
+        print("\n------------Validando certificado servidor...------------")
         verificar_servidor1= Encriptar.verificar_certificado(certificado_servidor, certificado_intermedio_servidor)
         verificar_servidor2= Encriptar.verificar_certificado(certificado_intermedio_servidor, certificado_raiz)
         if verificar_servidor1 and verificar_servidor2:

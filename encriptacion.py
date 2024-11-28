@@ -10,7 +10,7 @@ from cryptography.x509.oid import NameOID
 from cryptography.hazmat.primitives import hashes
 from datetime import datetime
 import datetime
-from cryptography.hazmat.primitives import padding
+from cryptography.hazmat.primitives.asymmetric import padding
 
 class Encriptar:
 
@@ -341,12 +341,12 @@ class Encriptar:
                     padding.PKCS1v15(),
                     certificado.signature_hash_algorithm,
                 )
-            except:
-                print("La firma del certificado no es válida")
+            except Exception as e:
+                print(f"La firma del certificado no es válida: {e}")
                 return False
             
             ahora = datetime.datetime.now(datetime.timezone.utc)
-            if not (certificado.not_valid_before <= ahora <= certificado.not_valid_after):
+            if not (certificado.not_valid_before_utc <= ahora <= certificado.not_valid_after_utc):
                 print("El certificado está fuera del periodo de validez")
                 return False
 
