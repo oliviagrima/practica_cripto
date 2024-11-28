@@ -259,14 +259,15 @@ class Base_datos:
     def sacar_claves_intermedio_usuarios():
         with open("base_de_datos/claves_ACs/claves_FlorentinoPerez.json", "r") as f:
             data = json.load(f)
-            clave_privada = serialization.load_pem_private_key(data["FlorentinoPerez"]["clave_privada"].encode(), password=None)
-            certificado = load_pem_x509_certificate(data["FlorentinoPerez"]["certificado"].encode())
-        return clave_privada, certificado
+            clave_privada_intermedio_usuarios = serialization.load_pem_private_key(data["FlorentinoPerez"]["clave_privada"].encode(), password=None)
+            certificado_intermedio_usuarios = load_pem_x509_certificate(data["FlorentinoPerez"]["certificado"].encode())
+        return clave_privada_intermedio_usuarios, certificado_intermedio_usuarios
     
     def extraer_certificado_cliente(usuario):
-        with open("base_de_datos/claves_usuarios/claves_{usuario}.json", "r") as f:
+        ruta_archivo = f"base_de_datos/claves_usuarios/claves_{usuario}.json"
+        with open(ruta_archivo, "r") as f:
             data = json.load(f)
-            certificado_cliente = load_pem_x509_certificate(data["cliente"]["certificado"].encode())
+            certificado_cliente = load_pem_x509_certificate(data[usuario]["certificado"].encode())
         return certificado_cliente
     
     def extraer_certificado_servidor():
@@ -274,3 +275,15 @@ class Base_datos:
             data = json.load(f)
             certificado_servidor = load_pem_x509_certificate(data["certificado"].encode())
         return certificado_servidor
+    
+    def extraer_certificado_intermedio_servidor():
+        with open("base_de_datos/claves_ACs/claves_JavierTebas.json", "r") as f:
+            data = json.load(f)
+            certificado_intermedio_servidor = load_pem_x509_certificate(data["JavierTebas"]["certificado"].encode())
+        return certificado_intermedio_servidor
+
+    def extraer_certificado_intermedio_raiz():
+        with open("base_de_datos/claves_ACs/claves_LaLiga.json", "r") as f:
+            data = json.load(f)
+            certificado_raiz = load_pem_x509_certificate(data["LaLiga"]["certificado"].encode())
+        return certificado_raiz

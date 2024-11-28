@@ -332,32 +332,23 @@ class Encriptar:
 
         return clave_privada_cliente, clave_publica_cliente, certificado_cliente
     
-    def verificar_certificado(certificado_emisor, certificado):
-        try:
-            certificado_emisor.public_key().verify(
-                certificado.signature,
-                certificado.tbs_certificate_bytes,
-                padding.PKCS1v15(),
-                certificado.signature_hash_algorithm,
-            )
-
-        except:
-            print("La firma del certificado no es válida")
-            return False
-        
-        ahora = datetime.datetime.now(datetime.timezone.utc)
-        if not (certificado.not_valid_before <= ahora <= certificado.not_valid_after):
-            print("El certificado está fuera del periodo de validez")
-            return False
-
-        try:
-            basic_constraints = certificado.extensions.get_extension_for_class(x509.BasicConstraints).value
-            if basic_constraints.ca:
-                print("El certificado no puede ser de una CA")
+    def verificar_certificado(certificado, certificado_emisor):
+        if certificado_emisor != certificado:
+            try:
+                certificado_emisor.public_key().verify(
+                    certificado.signature,
+                    certificado.tbs_certificate_bytes,
+                    padding.PKCS1v15(),
+                    certificado.signature_hash_algorithm,
+                )
+                print("La firma del certificado no es válida")
+            except:
+                print("La firma del certificado no es válida")
+                return False
+            
+            ahora = datetime.datetime.now(datetime.timezone.utc)
+            if not (certificado.not_valid_before <= ahora <= certificado.not_valid_after):
+                print("El certificado está fuera del periodo de validez")
                 return False
 
-
-        
-
-    
-    
+            return True
