@@ -341,7 +341,6 @@ class Encriptar:
                     padding.PKCS1v15(),
                     certificado.signature_hash_algorithm,
                 )
-                print("La firma del certificado no es válida")
             except:
                 print("La firma del certificado no es válida")
                 return False
