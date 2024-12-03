@@ -225,14 +225,14 @@ class Aplicacion:
         clave_privada_cliente = Base_datos.extraer_claves_cliente(usuario)[1]
         clave_privada_servidor = Base_datos.extraer_claves_servidor()[1]
 
-        print("\n-------------------Intercambio de clave de sesion-------------------")
-        clave_sesion_intercambiada, firma_clave_sesion = Encriptar.intercambio_clave_sesion(clave_privada_cliente.public_key(), clave_privada_servidor, clave_sesion)
+        print("\n-------------------INTERCAMBIO DE CLAVE DE SESIÓN-------------------")
+        clave_sesion_mandada, firma_clave_sesion = Encriptar.mandar_clave_sesion(clave_privada_cliente.public_key(), clave_privada_servidor, clave_sesion)
 
-        print("\n-------------------Verificando firma de la clave de sesion-------------------")
-        clave_sesion_desencriptada = Encriptar.desencriptar_clave_sesion(clave_sesion_intercambiada, firma_clave_sesion, clave_privada_servidor.public_key(), clave_privada_cliente)
-        if clave_sesion_desencriptada != False:
+        print("\n-------------------Verificando firma de la clave de sesión...-------------------")
+        clave_sesion_recibida = Encriptar.recibir_clave_sesion(clave_sesion_mandada, firma_clave_sesion, clave_privada_servidor.public_key(), clave_privada_cliente)
+        if clave_sesion_recibida != False:
             print("\nFirma de la clave de sesion verificada correctamente")
-            Base_datos.guardar_clave_sesion(clave_sesion_desencriptada) 
+            Base_datos.guardar_clave_sesion(clave_sesion_recibida) 
         else:
             seguir_en_mercado = False   
 

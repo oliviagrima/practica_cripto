@@ -342,8 +342,8 @@ class Encriptar:
 
             return True
         
-    def intercambio_clave_sesion(clave_publica_cliente, clave_privada_servidor, clave_sesion):
-        clave_sesion_cifrada = clave_publica_cliente.encrypt(
+    def mandar_clave_sesion(clave_publica_cliente, clave_privada_servidor, clave_sesion):
+        clave_sesion_mandada = clave_publica_cliente.encrypt(
             clave_sesion,
             padding.OAEP(
                 mgf=padding.MGF1(algorithm=hashes.SHA256()),
@@ -365,12 +365,12 @@ class Encriptar:
             hashes.SHA256(),
         )
 
-        return clave_sesion_cifrada, firma
+        return clave_sesion_mandada, firma
     
-    def desencriptar_clave_sesion(clave_sesion_cifrada, firma, clave_publica_servidor, clave_privada_cliente):
+    def recibir_clave_sesion(clave_sesion_cifrada, firma, clave_publica_servidor, clave_privada_cliente):
 
         try:
-            clave_sesion = clave_privada_cliente.decrypt(
+            clave_sesion_recibida = clave_privada_cliente.decrypt(
                 clave_sesion_cifrada,
                 padding.OAEP(
                     mgf=padding.MGF1(algorithm=hashes.SHA256()),
@@ -383,7 +383,7 @@ class Encriptar:
             return False
 
         hash = hashes.Hash(hashes.SHA256())
-        hash.update(clave_sesion)
+        hash.update(clave_sesion_recibida)
         hash_clave_sesion = hash.finalize()
 
         try:
@@ -400,7 +400,7 @@ class Encriptar:
             print(f"Error al verificar la firma de la clave de sesión: {e}")
             return False
 
-        return clave_sesion
+        return clave_sesion_recibida
         
     def cifrar_mensaje(mensaje, clave_sesion, clave_privada_remitente):
         mensaje_bytes = mensaje.encode()
