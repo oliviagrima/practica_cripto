@@ -367,11 +367,11 @@ class Encriptar:
 
         return clave_sesion_mandada, firma
     
-    def recibir_clave_sesion(clave_sesion_cifrada, firma, clave_publica_servidor, clave_privada_cliente):
+    def recibir_clave_sesion(clave_sesion_mandada, firma, clave_publica_servidor, clave_privada_cliente):
 
         try:
             clave_sesion_recibida = clave_privada_cliente.decrypt(
-                clave_sesion_cifrada,
+                clave_sesion_mandada,
                 padding.OAEP(
                     mgf=padding.MGF1(algorithm=hashes.SHA256()),
                     algorithm=hashes.SHA256(),
