@@ -194,10 +194,11 @@ class Aplicacion:
 
     def mercado(self, usuario):
         seguir_en_mercado = True
+        acabar_pregunta = False
         print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tMERCADO DE FICHAJES \n------------------------------------------------------------------------------------------------------------")
         print("\n---------------INTERCAMBIO DE CERTIFICADOS---------------")
-        certificado_cliente = Base_datos.extraer_certificado_cliente(usuario)
-        certificado_servidor = Base_datos.extraer_certificado_servidor()
+        certificado_cliente = Base_datos.extraer_claves_cliente(usuario)[0]
+        certificado_servidor = Base_datos.extraer_claves_servidor()[0]
         certificado_intermedio_usuarios = Base_datos.sacar_claves_intermedio_usuarios()[1]
         certificado_intermedio_servidor = Base_datos.extraer_certificado_intermedio_servidor()
         certificado_raiz = Base_datos.extraer_certificado_intermedio_raiz()
@@ -219,10 +220,23 @@ class Aplicacion:
         else:
             seguir_en_mercado = False
 
-        while seguir_en_mercado:
-            clave = Encriptar.generador_clave_chacha20_poly()
-            num_unico = os.urandom(12)
+        clave_sesion = Encriptar.generador_clave_chacha20_poly()
 
+        clave_privada_cliente = Base_datos.extraer_claves_cliente(usuario)[1]
+        clave_privada_servidor = Base_datos.extraer_claves_servidor()[1]
+
+        print("\n-------------------Intercambio de clave de sesion-------------------")
+        clave_sesion_intercambiada, firma_clave_sesion = Encriptar.intercambio_clave_sesion(clave_privada_cliente.public_key(), clave_privada_servidor, clave_sesion)
+
+        print("\n-------------------Verificando firma de la clave de sesion-------------------")
+        clave_sesion_desencriptada = Encriptar.desencriptar_clave_sesion(clave_sesion_intercambiada, firma_clave_sesion, clave_privada_servidor.public_key(), clave_privada_cliente)
+        if clave_sesion_desencriptada != False:
+            print("\nFirma de la clave de sesion verificada correctamente")
+            Base_datos.guardar_clave_sesion(clave_sesion_desencriptada) 
+        else:
+            seguir_en_mercado = False   
+
+        while seguir_en_mercado:
             lista_jugadores = ["Vini Jr", "Mbappe", "Rodrygo", "Bellingham", "Modric", "Valverde", "F. Mendy", "Rudiger", "E. Militao", "Carvajal", "Courtois"]
             print("\nJUGADORES DISPONIBLES:")
             jugadores_aleatorios = random.sample(lista_jugadores, 3)
@@ -234,90 +248,95 @@ class Aplicacion:
                 print("\n\t",indice, "→", jugador, ":", precios_jugadores[jugador], "M€")
                 indice += 1 
 
-            acabar_pregunta = False
             while not acabar_pregunta:
                 saldo_usuario = Base_datos.mostrar_saldo(usuario)
                 print("\nSaldo disponible: ", saldo_usuario, "M€")
                 print("\n------------------------------------------------------------------------------------------------------------")
                 
                 pregunta_compra = "¿DESEA COMPRAR ALGÚN JUGADOR? (si/no): "
-                pregunta_compra_cifrada = Encriptar.encriptar_mensaje(clave, pregunta_compra, num_unico)
+                clave_sesion = Base_datos.sacar_clave_sesion()
+                pregunta_compra_cifrada, nonce = Encriptar.cifrar_mensaje(pregunta_compra, clave_sesion, clave_privada_servidor)
                 print("\nPregunta de compra cifrada: ", pregunta_compra_cifrada)
 
-                try:
-                    pregunta_compra_descifrada = Encriptar.desencriptar_mensaje(clave, pregunta_compra_cifrada, num_unico)
+                pregunta_compra_descifrada= Encriptar.descifrar_mensaje(pregunta_compra_cifrada, nonce, clave_sesion, clave_privada_servidor.public_key())
+                if pregunta_compra_descifrada != False:
                     print("\nPregunta de compra descifrada: ", pregunta_compra_descifrada)
-                except:
+                else:
                     print ("\n--------------------------Ha habido un error en la autenticación del mensaje--------------------------")
                     
                 print("\n------------------------------------------------------------------------------------------------------------\n")
-
-                respuesta_texto = input(pregunta_compra_descifrada).lower()
                 
-                respuesta_compra_cifrada = Encriptar.encriptar_mensaje(clave, respuesta_texto, num_unico)
+                respuesta_texto = input(pregunta_compra_descifrada).lower()
+
+                respuesta_compra_cifrada, nonce = Encriptar.cifrar_mensaje(respuesta_texto, clave_sesion, clave_privada_cliente)
                 print("\nRespuesta de la compra cifrada: ", respuesta_compra_cifrada)
 
-                try:
-                    respuesta_compra_descifrada = Encriptar.desencriptar_mensaje(clave, respuesta_compra_cifrada, num_unico)
+                respuesta_compra_descifrada = Encriptar.descifrar_mensaje(respuesta_compra_cifrada, nonce, clave_sesion, clave_privada_cliente.public_key())
+                
+                if respuesta_compra_descifrada != False:
                     print("\nRespuesta de la compra descifrada: ", respuesta_compra_descifrada)
 
                     if respuesta_compra_descifrada == "si":
                         self.comprar_jugador(usuario, jugadores_aleatorios, precios_jugadores)
                         acabar_pregunta = True
+                        seguir_en_mercado = False
 
                     elif respuesta_compra_descifrada == "no":
                         print("\n---------------------------------------No ha comprado ningún jugador---------------------------------------")
                         acabar_pregunta = True
-                    
+                        seguir_en_mercado = False
+                
                     else:
                         print("\n---------------------------------------------Comando no válido---------------------------------------------")
-                        
-                        respuesta_texto = input("\nPor favor, ingrese 'si' o 'no': ").lower()
-                        respuesta_compra_cifrada = Encriptar.encriptar_mensaje(clave, respuesta_texto, num_unico)
-                        print("\nRespuesta de la compra cifrada: ", respuesta_compra_cifrada)
 
-                        try:
-                            respuesta_compra_descifrada = Encriptar.desencriptar_mensaje(clave, respuesta_compra_cifrada, num_unico)
+                        respuesta_texto = input("\nPor favor, ingrese 'si' o 'no': ").lower()
+                        respuesta_compra_cifrada, nonce = Encriptar.cifrar_mensaje(respuesta_texto, clave_sesion, clave_privada_cliente)
+                        print("\nRespuesta de la compra cifrada: ", respuesta_compra_cifrada)
+                        
+                        respuesta_compra_descifrada = Encriptar.descifrar_mensaje(respuesta_compra_cifrada, nonce, clave_sesion, clave_privada_cliente.public_key())
+                        if respuesta_compra_descifrada != False:
                             print("\nRespuesta de la compra descifrada: ", respuesta_compra_descifrada)
 
                             if respuesta_compra_descifrada == "si":
                                 self.comprar_jugador(usuario, jugadores_aleatorios, precios_jugadores)
                                 acabar_pregunta = True
+                                seguir_en_mercado = False
 
                             elif respuesta_compra_descifrada == "no":
                                 print("\n---------------------------------------No ha comprado ningún jugador---------------------------------------")
                                 acabar_pregunta = True
-                        
-                        except:
+                                seguir_en_mercado = False
+                        else:
                             print ("\n--------------------------Ha habido un error en la autenticación del mensaje--------------------------")
-                except:
+                else:
                     print ("\n--------------------------Ha habido un error en la autenticación del mensaje--------------------------")
 
         
     def comprar_jugador(self, usuario, jugadores_aleatorios, precios_jugadores):
         print("\n-----------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tCOMPRAR JUGADOR \n-----------------------------------------------------------------------------------------------------------")
 
-        clave = Encriptar.generador_clave_chacha20_poly()
-        num_unico = os.urandom(12)
+        clave_sesion = Base_datos.sacar_clave_sesion()
+        clave_privada_servidor = Base_datos.extraer_claves_servidor()[1]
+        clave_privada_cliente = Base_datos.extraer_claves_cliente(usuario)[1]
 
         pregunta_jugador = "Ingrese el nombre del jugador que desea comprar: "
-        pregunta_jugador_cifrada = Encriptar.encriptar_mensaje(clave, pregunta_jugador, num_unico)
+        pregunta_jugador_cifrada, nonce = Encriptar.cifrar_mensaje(pregunta_jugador, clave_sesion, clave_privada_servidor)
         print("\nPregunta del jugador cifrada: ", pregunta_jugador_cifrada)
 
-        try:
-            pregunta_jugador_descifrada = Encriptar.desencriptar_mensaje(clave, pregunta_jugador_cifrada, num_unico)
+        pregunta_jugador_descifrada = Encriptar.descifrar_mensaje(pregunta_jugador_cifrada, nonce, clave_sesion, clave_privada_servidor.public_key())
+        if pregunta_jugador_descifrada != False:
             print("\nPregunta del jugador descifrada: ", pregunta_jugador_descifrada)
-        except:
+        else:
             print ("\n--------------------------Ha habido un error en la autenticación del mensaje--------------------------")
         
         print("\n------------------------------------------------------------------------------------------------------------\n") 
         
         jugador_comprado = input(pregunta_jugador_descifrada)
-        respuesta_jugador_cifrada = Encriptar.encriptar_mensaje(clave, jugador_comprado, num_unico)
+        respuesta_jugador_cifrada, nonce = Encriptar.cifrar_mensaje(jugador_comprado, clave_sesion, clave_privada_cliente)
         print("\nRespuesta del jugador cifrada: ", respuesta_jugador_cifrada)
 
-        try:
-            respuesta_jugador_descifrada = Encriptar.desencriptar_mensaje(clave, respuesta_jugador_cifrada, num_unico)
+        respuesta_jugador_descifrada = Encriptar.descifrar_mensaje(respuesta_jugador_cifrada, nonce, clave_sesion, clave_privada_cliente.public_key())
+        if respuesta_jugador_descifrada != False:
             print("\nRespuesta del jugador descifrada: ", respuesta_jugador_descifrada)
             compra_de_jugadores = True
             while compra_de_jugadores:
@@ -328,14 +347,15 @@ class Aplicacion:
                 else:
                     print("\n------------------------------------Jugador no disponible en el mercado------------------------------------")
                     jugador_comprado = input("\nIngrese el nombre del jugador que desea comprar: ")
-                    respuesta_jugador_cifrada = Encriptar.encriptar_mensaje(clave, jugador_comprado, num_unico)
+                    respuesta_jugador_cifrada, nonce = Encriptar.cifrar_mensaje(jugador_comprado, clave_sesion, clave_privada_cliente)
                     print("\nRespuesta del jugador cifrada: ", respuesta_jugador_cifrada)
-                    try:
-                        respuesta_jugador_descifrada = Encriptar.desencriptar_mensaje(clave, respuesta_jugador_cifrada, num_unico)
+
+                    respuesta_jugador_descifrada = Encriptar.descifrar_mensaje(respuesta_jugador_cifrada, nonce, clave_sesion, clave_privada_cliente.public_key())
+                    if respuesta_jugador_descifrada != False:
                         print("\nRespuesta del jugador descifrada: ", respuesta_jugador_descifrada)
-                    except:
+                    else:
                         print ("\n--------------------------Ha habido un error en la autenticación del mensaje--------------------------")
-        except:
+        else:
             print ("\n--------------------------Ha habido un error en la autenticación del mensaje--------------------------")
     
     def equipo(self, usuario):

@@ -263,18 +263,20 @@ class Base_datos:
             certificado_intermedio_usuarios = load_pem_x509_certificate(data["FlorentinoPerez"]["certificado"].encode())
         return clave_privada_intermedio_usuarios, certificado_intermedio_usuarios
     
-    def extraer_certificado_cliente(usuario):
+    def extraer_claves_cliente(usuario):
         ruta_archivo = f"base_de_datos/claves_usuarios/claves_{usuario}.json"
         with open(ruta_archivo, "r") as f:
             data = json.load(f)
             certificado_cliente = load_pem_x509_certificate(data[usuario]["certificado"].encode())
-        return certificado_cliente
+            clave_privada_cliente = serialization.load_pem_private_key(data[usuario]["clave_privada"].encode(), password=None)
+        return certificado_cliente, clave_privada_cliente
     
-    def extraer_certificado_servidor():
+    def extraer_claves_servidor():
         with open("base_de_datos/claves_servidor.json", "r") as f:
             data = json.load(f)
             certificado_servidor = load_pem_x509_certificate(data["certificado"].encode())
-        return certificado_servidor
+            clave_privada_servidor = serialization.load_pem_private_key(data["clave_privada"].encode(), password=None)
+        return certificado_servidor, clave_privada_servidor
     
     def extraer_certificado_intermedio_servidor():
         with open("base_de_datos/claves_ACs/claves_JavierTebas.json", "r") as f:
@@ -287,3 +289,21 @@ class Base_datos:
             data = json.load(f)
             certificado_raiz = load_pem_x509_certificate(data["LaLiga"]["certificado"].encode())
         return certificado_raiz
+    
+    def guardar_clave_sesion(clave_sesion):
+        try:
+            with open("base_de_datos/clave_sesion.json", "r") as f:
+                data = json.load(f)
+                clave_sesion = data["clave"]
+        except(json.decoder.JSONDecodeError, FileNotFoundError):
+            data = {}
+            data["clave"] = clave_sesion.hex()
+
+        with open("base_de_datos/clave_sesion.json", "w") as f:
+            json.dump(data, f, indent=4)
+
+    def sacar_clave_sesion():
+        with open("base_de_datos/clave_sesion.json", "r") as f:
+            data = json.load(f)
+            clave_sesion = bytes.fromhex(data["clave"])
+        return clave_sesion

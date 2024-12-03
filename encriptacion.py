@@ -44,16 +44,6 @@ class Encriptar:
         clave = os.urandom(32)
         return clave
 
-    def encriptar_mensaje(clave, mensaje, num_unico):
-        chacha = ChaCha20Poly1305(clave)
-        mensaje_cifrado = chacha.encrypt(num_unico, mensaje.encode(), None)
-        return mensaje_cifrado
-
-    def desencriptar_mensaje(clave, mensaje_cifrado, num_unico):
-        chacha = ChaCha20Poly1305(clave)
-        mensaje_descifrado = chacha.decrypt(num_unico, mensaje_cifrado, None)
-        return mensaje_descifrado.decode()
-
     def generador_claves():
         clave_privada = rsa.generate_private_key(
             public_exponent=65537,
@@ -351,3 +341,113 @@ class Encriptar:
                 return False
 
             return True
+        
+    def intercambio_clave_sesion(clave_publica_cliente, clave_privada_servidor, clave_sesion):
+        clave_sesion_cifrada = clave_publica_cliente.encrypt(
+            clave_sesion,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None,
+            )
+        )
+
+        hash = hashes.Hash(hashes.SHA256())
+        hash.update(clave_sesion)
+        hash_clave_sesion = hash.finalize()
+
+        firma = clave_privada_servidor.sign(
+            hash_clave_sesion,
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH,
+            ),
+            hashes.SHA256(),
+        )
+
+        return clave_sesion_cifrada, firma
+    
+    def desencriptar_clave_sesion(clave_sesion_cifrada, firma, clave_publica_servidor, clave_privada_cliente):
+
+        try:
+            clave_sesion = clave_privada_cliente.decrypt(
+                clave_sesion_cifrada,
+                padding.OAEP(
+                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                    algorithm=hashes.SHA256(),
+                    label=None,
+                )
+            )
+        except Exception as e:
+            print(f"Error al descifrar la clave de sesión: {e}")
+            return False
+
+        hash = hashes.Hash(hashes.SHA256())
+        hash.update(clave_sesion)
+        hash_clave_sesion = hash.finalize()
+
+        try:
+            clave_publica_servidor.verify(
+                firma,
+                hash_clave_sesion,
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH,
+                ),
+                hashes.SHA256(),
+            )
+        except Exception as e:
+            print(f"Error al verificar la firma de la clave de sesión: {e}")
+            return False
+
+        return clave_sesion
+        
+    def cifrar_mensaje(mensaje, clave_sesion, clave_privada_remitente):
+        mensaje_bytes = mensaje.encode()
+
+        hash = hashes.Hash(hashes.SHA256())
+        hash.update(mensaje_bytes)
+        hash_mensaje = hash.finalize()
+
+        firma = clave_privada_remitente.sign(
+            hash_mensaje,
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH,
+            ),
+            hashes.SHA256(),
+        )
+
+        mensaje_y_firma = mensaje_bytes + b"||" + firma
+
+        nonce = os.urandom(12)
+        chacha = ChaCha20Poly1305(clave_sesion)
+        mensaje_cifrado = chacha.encrypt(nonce, mensaje_y_firma, None)
+
+        return mensaje_cifrado, nonce
+    
+    def descifrar_mensaje(mensaje_cifrado, nonce, clave_sesion, clave_publica_remitente):
+        chacha = ChaCha20Poly1305(clave_sesion)
+        mensaje_y_firma = chacha.decrypt(nonce, mensaje_cifrado, None)
+
+        mensaje_bytes, firma = mensaje_y_firma.split(b"||", 1)
+
+        hash = hashes.Hash(hashes.SHA256())
+        hash.update(mensaje_bytes)
+        hash_mensaje = hash.finalize()
+
+        try:
+            clave_publica_remitente.verify(
+                firma,
+                hash_mensaje,
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH,
+                ),
+                hashes.SHA256(),
+            )
+        except Exception as e:
+            print(f"Error al verificar la firma del mensaje: {e}")
+            return False
+
+        return mensaje_bytes.decode()
