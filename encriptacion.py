@@ -123,7 +123,7 @@ class Encriptar:
         ).not_valid_before(
             datetime.datetime.now(datetime.timezone.utc)
         ).not_valid_after(
-            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=3650)
+            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1825)
         ).add_extension(
             x509.BasicConstraints(ca=True, path_length=0), critical=True,
         ).add_extension(
@@ -172,7 +172,7 @@ class Encriptar:
         ).not_valid_before(
             datetime.datetime.now(datetime.timezone.utc)
         ).not_valid_after(
-            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=3650)
+            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1825)
         ).add_extension(
             x509.BasicConstraints(ca=True, path_length=0), critical=True,
         ).add_extension(
@@ -221,7 +221,7 @@ class Encriptar:
         ).not_valid_before(
             datetime.datetime.now(datetime.timezone.utc)
         ).not_valid_after(
-            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=3650)
+            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1095)
         ).add_extension(
             x509.BasicConstraints(ca=False, path_length=None), 
             critical=True,
@@ -283,7 +283,7 @@ class Encriptar:
         ).not_valid_before(
             datetime.datetime.now(datetime.timezone.utc)
         ).not_valid_after(
-            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=3650)
+            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1095)
         ).add_extension(
             x509.BasicConstraints(ca=False, path_length=None), 
             critical=True,
