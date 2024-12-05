@@ -59,7 +59,7 @@ class Base_datos:
     def guardar_json_clave(clave):
         clave_base64 = base64.urlsafe_b64encode(clave).hex()
         try:
-            with open("base_de_datos/clave_encriptacion.json", "r") as f:
+            with open("archivos_privados/clave_encriptacion.json", "r") as f:
                 data = json.load(f)
         except(json.decoder.JSONDecodeError, FileNotFoundError):
             data = {}
@@ -69,7 +69,7 @@ class Base_datos:
                 "clave": clave_base64
             }
 
-        with open("base_de_datos/clave_encriptacion.json", "w") as file:
+        with open("archivos_privados/clave_encriptacion.json", "w") as file:
             json.dump(data, file, indent=4)
 
     def guardar_json_salt_token(usuario, salt, token):
@@ -89,7 +89,7 @@ class Base_datos:
         
 
     def sacar_json_clave():
-        with open("base_de_datos/clave_encriptacion.json", "r") as f:
+        with open("archivos_privados/clave_encriptacion.json", "r") as f:
             data = json.load(f)
             clave = base64.urlsafe_b64decode(bytes.fromhex(data["clave"]))
         return clave
@@ -183,7 +183,7 @@ class Base_datos:
         )
 
         try:
-            with open("base_de_datos/claves_servidor.json", "r") as f:
+            with open("archivos_privados/claves_servidor.json", "r") as f:
                 data = json.load(f)
         except(json.decoder.JSONDecodeError, FileNotFoundError):
             data = {}
@@ -191,7 +191,7 @@ class Base_datos:
             data["clave_privada"] = private_pem.decode()
             data["certificado"] = certificado_pem.decode()
 
-        with open("base_de_datos/claves_servidor.json", "w") as f:
+        with open("archivos_privados/claves_servidor.json", "w") as f:
             json.dump(data, f, indent=4)
 
     def guardar_json_claves_usuario(usuario, clave_privada, clave_publica, certificado):
@@ -210,8 +210,8 @@ class Base_datos:
             encoding=serialization.Encoding.PEM
         )
 
-        os.makedirs("base_de_datos/claves_usuarios", exist_ok=True)
-        ruta_archivo = f"base_de_datos/claves_usuarios/claves_{usuario}.json"
+        os.makedirs("archivos_privados/claves_usuarios", exist_ok=True)
+        ruta_archivo = f"archivos_privados/claves_usuarios/claves_{usuario}.json"
 
         try:
             with open(ruta_archivo, "r") as f:
@@ -241,8 +241,8 @@ class Base_datos:
             encoding=serialization.Encoding.PEM
         )
 
-        os.makedirs("base_de_datos/claves_ACs", exist_ok=True)
-        ruta_archivo = f"base_de_datos/claves_ACs/claves_{nombre_ac}.json"
+        os.makedirs("archivos_privados/claves_ACs", exist_ok=True)
+        ruta_archivo = f"archivos_privados/claves_ACs/claves_{nombre_ac}.json"
 
         try:
             with open(ruta_archivo, "r") as f:
@@ -257,14 +257,14 @@ class Base_datos:
             json.dump(data, f, indent=4)
 
     def sacar_claves_intermedio_usuarios():
-        with open("base_de_datos/claves_ACs/claves_FlorentinoPerez.json", "r") as f:
+        with open("archivos_privados/claves_ACs/claves_FlorentinoPerez.json", "r") as f:
             data = json.load(f)
             clave_privada_intermedio_usuarios = serialization.load_pem_private_key(data["FlorentinoPerez"]["clave_privada"].encode(), password=None)
             certificado_intermedio_usuarios = load_pem_x509_certificate(data["FlorentinoPerez"]["certificado"].encode())
         return clave_privada_intermedio_usuarios, certificado_intermedio_usuarios
     
     def extraer_claves_cliente(usuario):
-        ruta_archivo = f"base_de_datos/claves_usuarios/claves_{usuario}.json"
+        ruta_archivo = f"archivos_privados/claves_usuarios/claves_{usuario}.json"
         with open(ruta_archivo, "r") as f:
             data = json.load(f)
             certificado_cliente = load_pem_x509_certificate(data[usuario]["certificado"].encode())
@@ -272,38 +272,38 @@ class Base_datos:
         return certificado_cliente, clave_privada_cliente
     
     def extraer_claves_servidor():
-        with open("base_de_datos/claves_servidor.json", "r") as f:
+        with open("archivos_privados/claves_servidor.json", "r") as f:
             data = json.load(f)
             certificado_servidor = load_pem_x509_certificate(data["certificado"].encode())
             clave_privada_servidor = serialization.load_pem_private_key(data["clave_privada"].encode(), password=None)
         return certificado_servidor, clave_privada_servidor
     
     def extraer_certificado_intermedio_servidor():
-        with open("base_de_datos/claves_ACs/claves_JavierTebas.json", "r") as f:
+        with open("archivos_privados/claves_ACs/claves_JavierTebas.json", "r") as f:
             data = json.load(f)
             certificado_intermedio_servidor = load_pem_x509_certificate(data["JavierTebas"]["certificado"].encode())
         return certificado_intermedio_servidor
 
     def extraer_certificado_intermedio_raiz():
-        with open("base_de_datos/claves_ACs/claves_LaLiga.json", "r") as f:
+        with open("archivos_privados/claves_ACs/claves_LaLiga.json", "r") as f:
             data = json.load(f)
             certificado_raiz = load_pem_x509_certificate(data["LaLiga"]["certificado"].encode())
         return certificado_raiz
     
     def guardar_clave_sesion(clave_sesion):
         try:
-            with open("base_de_datos/clave_sesion.json", "r") as f:
+            with open("archivos_privados/clave_sesion.json", "r") as f:
                 data = json.load(f)
                 clave_sesion = data["clave"]
         except(json.decoder.JSONDecodeError, FileNotFoundError):
             data = {}
             data["clave"] = clave_sesion.hex()
 
-        with open("base_de_datos/clave_sesion.json", "w") as f:
+        with open("archivos_privados/clave_sesion.json", "w") as f:
             json.dump(data, f, indent=4)
 
     def sacar_clave_sesion():
-        with open("base_de_datos/clave_sesion.json", "r") as f:
+        with open("archivos_privados/clave_sesion.json", "r") as f:
             data = json.load(f)
             clave_sesion = bytes.fromhex(data["clave"])
         return clave_sesion

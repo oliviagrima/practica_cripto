@@ -196,7 +196,7 @@ class Aplicacion:
         seguir_en_mercado = True
         acabar_pregunta = False
         print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tMERCADO DE FICHAJES \n------------------------------------------------------------------------------------------------------------")
-        print("\n---------------INTERCAMBIO DE CERTIFICADOS---------------")
+        print("\n-----------------------------------------INTERCAMBIO DE CERTIFICADOS----------------------------------------")
         certificado_cliente = Base_datos.extraer_claves_cliente(usuario)[0]
         certificado_servidor = Base_datos.extraer_claves_servidor()[0]
         certificado_intermedio_usuarios = Base_datos.sacar_claves_intermedio_usuarios()[1]
@@ -225,10 +225,10 @@ class Aplicacion:
         clave_privada_cliente = Base_datos.extraer_claves_cliente(usuario)[1]
         clave_privada_servidor = Base_datos.extraer_claves_servidor()[1]
 
-        print("\n-------------------INTERCAMBIO DE CLAVE DE SESIÓN-------------------")
+        print("\n---------------------------------------INTERCAMBIO DE CLAVE DE SESIÓN---------------------------------------")
         clave_sesion_mandada, firma_clave_sesion = Encriptar.mandar_clave_sesion(clave_privada_cliente.public_key(), clave_privada_servidor, clave_sesion)
 
-        print("\n-------------------Verificando firma de la clave de sesión...-------------------")
+        print("\n------------Verificando firma de la clave de sesión...------------")
         clave_sesion_recibida = Encriptar.recibir_clave_sesion(clave_sesion_mandada, firma_clave_sesion, clave_privada_servidor.public_key(), clave_privada_cliente)
         if clave_sesion_recibida != False:
             print("\nFirma de la clave de sesion verificada correctamente")
