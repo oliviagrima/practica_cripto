@@ -67,9 +67,11 @@ class Aplicacion:
         print("\n------------------------------------------------------------------------------------------------------------\n\t\t\t\t\t\tREGISTRO \n------------------------------------------------------------------------------------------------------------")
         usuario = input("\nIngrese el nombre de usuario: ")
         
+        Base_datos.desencriptar_fichero()
         while Base_datos.confirmar_usuario(usuario):
             print("\n----------------------Este usuario ya existe, por favor, ingrese otro nombre de usuario----------------------")
-            usuario = input("\nIngrese el nombre de usuario: ")
+            usuario = input("\nIngrese otro nombre de usuario: ")
+        Base_datos.encriptar_fichero()
 
         contraseña_adecuada= False
         while not contraseña_adecuada:

@@ -1,6 +1,8 @@
 {
     "Olivia": {
-        "saldo": 40,
-        "equipo": []
+        "saldo": 37,
+        "equipo": [
+            "Valverde"
+        ]
     }
 }
