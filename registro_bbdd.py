@@ -307,3 +307,7 @@ class Base_datos:
             data = json.load(f)
             clave_sesion = bytes.fromhex(data["clave"])
         return clave_sesion
+    
+    def borrar_clave_sesion():
+        os.remove("archivos_privados/clave_sesion.json")
+

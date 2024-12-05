@@ -211,6 +211,7 @@ class Aplicacion:
             print("\nCertificado del cliente validado correctamente")
         else:
             seguir_en_mercado = False
+            Base_datos.borrar_clave_sesion()
         
         print("\n------------Validando certificado servidor...------------")
         verificar_servidor1= Encriptar.verificar_certificado(certificado_servidor, certificado_intermedio_servidor)
@@ -219,6 +220,7 @@ class Aplicacion:
             print("\nCertificado del servidor validado correctamente")
         else:
             seguir_en_mercado = False
+            Base_datos.borrar_clave_sesion()
 
         clave_sesion = Encriptar.generador_clave_chacha20_poly()
 
@@ -234,7 +236,8 @@ class Aplicacion:
             print("\nFirma de la clave de sesion verificada correctamente")
             Base_datos.guardar_clave_sesion(clave_sesion_recibida) 
         else:
-            seguir_en_mercado = False   
+            seguir_en_mercado = False
+            Base_datos.borrar_clave_sesion()   
 
         while seguir_en_mercado:
             lista_jugadores = ["Vini Jr", "Mbappe", "Rodrygo", "Bellingham", "Modric", "Valverde", "F. Mendy", "Rudiger", "E. Militao", "Carvajal", "Courtois"]
@@ -285,6 +288,7 @@ class Aplicacion:
                         print("\n---------------------------------------No ha comprado ningún jugador---------------------------------------")
                         acabar_pregunta = True
                         seguir_en_mercado = False
+                        Base_datos.borrar_clave_sesion()
                 
                     else:
                         print("\n---------------------------------------------Comando no válido---------------------------------------------")
@@ -306,6 +310,7 @@ class Aplicacion:
                                 print("\n---------------------------------------No ha comprado ningún jugador---------------------------------------")
                                 acabar_pregunta = True
                                 seguir_en_mercado = False
+                                Base_datos.borrar_clave_sesion()
                         else:
                             print ("\n--------------------------Ha habido un error en la autenticación del mensaje--------------------------")
                 else:
@@ -344,6 +349,7 @@ class Aplicacion:
                     precio_jugador = precios_jugadores[jugador_comprado]
                     Base_datos.fichar_jugador(usuario, jugador_comprado, precio_jugador)
                     compra_de_jugadores = False
+                    Base_datos.borrar_clave_sesion()
                 else:
                     print("\n------------------------------------Jugador no disponible en el mercado------------------------------------")
                     jugador_comprado = input("\nIngrese el nombre del jugador que desea comprar: ")
@@ -355,7 +361,8 @@ class Aplicacion:
                         print("\nRespuesta del jugador descifrada: ", respuesta_jugador_descifrada)
                     else:
                         print ("\n--------------------------Ha habido un error en la autenticación del mensaje--------------------------")
-        else:
+                        compra_de_jugadores = False
+        else:   
             print ("\n--------------------------Ha habido un error en la autenticación del mensaje--------------------------")
     
     def equipo(self, usuario):
