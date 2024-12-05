@@ -213,7 +213,7 @@ class Aplicacion:
             print("\nCertificado del cliente validado correctamente")
         else:
             seguir_en_mercado = False
-            Base_datos.borrar_clave_sesion()
+            
         
         print("\n------------Validando certificado servidor...------------")
         verificar_servidor1= Encriptar.verificar_certificado(certificado_servidor, certificado_intermedio_servidor)
@@ -222,7 +222,7 @@ class Aplicacion:
             print("\nCertificado del servidor validado correctamente")
         else:
             seguir_en_mercado = False
-            Base_datos.borrar_clave_sesion()
+            
 
         clave_sesion = Encriptar.generador_clave_chacha20_poly()
 
